@@ -64,6 +64,7 @@ LayoutDesigner <-
 
 # CircularLayoutDesigner --------------------------------------------------
 
+#' @export
 CircularLayoutDesigner <-
   R6Class(
     classname = 'CircularLayoutDesigner',
@@ -224,7 +225,7 @@ CircularLayoutDesigner <-
 
 
 # RectangularLayoutDesigner -----------------------------------------------
-
+#' @export
 RectangularLayoutDesigner <-
   R6::R6Class(
     classname = 'RectangularLayoutDesigner',

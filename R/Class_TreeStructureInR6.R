@@ -77,6 +77,7 @@ ListTreeNode <- R6Class(
 
 
 # Define the Graphic node inherit from the generic node --------------------------------------------
+#' @export
 GraphicNode <- R6Class(
   classname = "GraphicNode",
   inherit = ListTreeNode,
@@ -90,6 +91,7 @@ GraphicNode <- R6Class(
 # Define the Data structure for the GraphicTree --------------------------------------------
 # It most has a rootNode
 # the longestDepth and numOfLeaves is employed for the layout computation
+#' @export
 GraphicTree <- R6Class(classname = "GraphicTree", public = list(
   # following are general properties
   rootNode = NA,

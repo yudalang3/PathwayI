@@ -1,6 +1,6 @@
 Package: PathwayIlluminator
 Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.1001
+Version: 0.0.0.1002
 Authors@R: 
     person("Dalang", "Yu", , "dalangyusci@gmail.com", role = c("aut", "cre"))
 Description: The beautifull pathway drawer.

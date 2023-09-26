@@ -1,3 +1,4 @@
+#' @export
 BioGraphicNode <- R6Class(
   classname = "BioGraphicNode",
   inherit = GraphicNode,
