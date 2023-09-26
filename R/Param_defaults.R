@@ -3,6 +3,7 @@
 
 global_pars <- new.env()
 global_pars[['blank_area_ratio']] <- list(l = 0.05, r = 0.05, t = 0.02, b = 0.02)
+global_pars[['fontsize']] <- 12
 
 #' Set the parameters for the global value.
 #'

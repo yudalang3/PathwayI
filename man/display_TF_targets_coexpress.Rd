@@ -6,11 +6,12 @@
 \usage{
 display_TF_targets_coexpress(
   data = list(TF = "TF1", targets = paste0("g", c(4, 1, 9, 8, 3, 2, 6, 7, 5)),
-    coexpression = c(paste0("g", 1:7), paste0("k", 1:3)))
+    coexpression = c(paste0("g", 1:7), paste0("k", 1:3))),
+  buttomStyleBezier = F
 )
 }
 \arguments{
-\item{data:}{A list with TF, targets and coexpression. The contents are char vector.}
+\item{buttomStyleBezier}{}
 }
 \description{
 The input data list needs three elements, the name is fiexed: TF, targets and coexpression.

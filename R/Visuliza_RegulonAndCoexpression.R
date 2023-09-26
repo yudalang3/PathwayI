@@ -61,8 +61,8 @@ getBottomXYList_fromBezier <- function(ol, default_unit) {
 
   y = c(
     ol$y_coeNodes_leftMost,
-    ol$y_coeNodes_leftMost - ol$circle_unit_r_value * 2 ,
-    ol$y_coeNodes_leftMost - ol$circle_unit_r_value * 2 ,
+    ol$y_coeNodes_leftMost - ol$circle_unit_r_value * 2.2 ,
+    ol$y_coeNodes_leftMost - ol$circle_unit_r_value * 2.2 ,
     ol$y_coeNodes_rightMost
   )
 
@@ -86,25 +86,34 @@ getBottomXYList_fromMultipleCurves <-
     x_ploygon <- vector()
     y_ploygon <- vector()
 
+    length_of_co <- length(coexpresNodes_belongsTo_targets)
     xx1 <- map_dbl(rev(coexpresNodes_belongsTo_targets), ~ .x$xAxis_or_radius + half_unit_coexpression_node)
-    xx1[1] <- ol$x_coeNodes_leftMost
+    xx1[1] <- ol$x_coeNodes_rightMost
     xx2 <- map_dbl(rev(coexpresNodes_belongsTo_targets), ~ .x$xAxis_or_radius - half_unit_coexpression_node)
-    xx2[length(xx2)] <- ol$x_coeNodes_rightMost
-    yy <- map_dbl(rev(coexpresNodes_belongsTo_targets), ~ .x$yAxis_or_angle)
+    xx2[length_of_co] <- ol$x_coeNodes_leftMost
 
-    pwalk(list(xx1,xx2,yy), function(x1,x2,y) {
-      yAxix <- x$yAxis_or_angle - 0.3 * x$circle_radius
+
+    yy1 <- map_dbl(rev(coexpresNodes_belongsTo_targets), ~ .x$yAxis_or_angle - 0.5 * ol$circle_unit_r_value )
+    temp_y <- ol$y_coeNodes_rightMost
+    yy1[1] <- temp_y
+    yy2 <- map_dbl(rev(coexpresNodes_belongsTo_targets), ~ .x$yAxis_or_angle - 0.5 * ol$circle_unit_r_value )
+    yy2[length_of_co] <-  temp_y
+
+    curvatures <- rep(-0.5, length_of_co)
+    curvatures[1] <- -0.7
+    curvatures[length_of_co] <- -0.7
+
+    pwalk(list(xx1,xx2,yy1,yy2,curvatures), function(x1,x2,y1,y2,curvature) {
       a <- curveGrob(
         x1 = x1,
-        y1 = y,
+        y1 = y1,
         x2 = x2,
-        y2 = y,
+        y2 = y2,
         default.units = default_unit,
         square = F,
-        curvature = -0.8,
+        curvature = curvature,
         ncp = 8
       )
-      # grid.draw(a)
 
       b <- grobCoords(a, closed = F)
 
@@ -252,24 +261,25 @@ half_unit_coexpression_node = 0.5) {
 
 #' Display the TF targets and co expressed genes.
 #'
+#' @param data a list
+#' @param buttomStyleBezier
+#'
 #' @description
 #' The input data list needs three elements, the name is fiexed: TF, targets and coexpression.
 #'
-#'
-#' @param data: A list with TF, targets and coexpression. The contents are char vector.
 #'
 #' @export
 #'
 #' @examples
 #' display_TF_targets_coexpress()
+#' display_TF_targets_coexpress(buttomStyleBezier = F)
 #'
-#' #######
-#' targets = c("")
 display_TF_targets_coexpress <- function(data = list(
   TF = "TF1",
   targets = paste0("g", c(4, 1, 9, 8, 3, 2, 6, 7, 5)),
   coexpression = c(paste0("g", 1:7), paste0("k", 1:3))
-)) {
+), buttomStyleBezier = F) {
+
   default_unit = 'in'
   last_index_of_coexpresion_belongTo_targes <-
     length(intersect(data$coexpression, data$targets))
@@ -363,6 +373,7 @@ display_TF_targets_coexpress <- function(data = list(
 
   x_TF_top <- node_TF$xAxis_or_radius
 
+
   y_TF_top <- node_TF$yAxis_or_angle + node_TF$circle_radius * 1.4
 
   x_TF_left <-
@@ -377,10 +388,8 @@ display_TF_targets_coexpress <- function(data = list(
 
 
   x_coeNodes_leftMost <-
-    firstCoexprNode_belTo_tars$xAxis_or_radius - radius_circule_coeNode * 1.3
-  if (x_coeNodes_leftMost < 0) {
-    x_coeNodes_leftMost <- 0
-  }
+    firstCoexprNode_belTo_tars$xAxis_or_radius - half_unit_coexpression_node
+
   y_coeNodes_leftMost <- firstCoexprNode_belTo_tars$yAxis_or_angle
 
   x_coeNodes_1_afMost <- firstCoexprNode_belTo_tars$xAxis_or_radius
@@ -393,7 +402,7 @@ display_TF_targets_coexpress <- function(data = list(
     lastCoexprNode_belongsTo_targets$yAxis_or_angle - radius_circule_coeNode * 1.4
   if (last_index_of_coexpresion_belongTo_targes == num_coexpression_nodes) {
     x_coeNodes_rightMost <-
-      firstCoexprNode_belTo_tars$xAxis_or_radius + radius_circule_coeNode * 1.3
+      firstCoexprNode_belTo_tars$xAxis_or_radius + half_unit_coexpression_node
   } else {
     x_coeNodes_rightMost <-
       0.5 * (
@@ -426,7 +435,7 @@ display_TF_targets_coexpress <- function(data = list(
     ol = outlinePoints,
     coexpresNodes_belongsTo_targets = coexpresNodes_belongsTo_targets,
     default_unit = default_unit,
-    buttomStyleBezier = F,
+    buttomStyleBezier = buttomStyleBezier,
     half_unit_coexpression_node
   )
 
@@ -454,11 +463,17 @@ display_TF_targets_coexpress <- function(data = list(
 
 
   # draw the coexpression genes
-  default_gpar_for_genes <- gpar(fill = '#DDDDDD', lwd = 1)
+  default_gpar_for_genes <-
+    gpar(fill = '#DDDDDD',
+         lwd = 1,
+         fontsize = global_pars[['fontsize']])
   gpar_for_coexp_butNot_targ <-
-    gpar(col = '#828282',
-         fill = '#DDDDDD',
-         lwd = 1)
+    gpar(
+      col = '#828282',
+      fill = '#DDDDDD',
+      lwd = 1,
+      fontsize = global_pars[['fontsize']]
+    )
   # draw the coexpression genes
   draw_coexpressed_genes <- function(x, index) {
     x_tf <- node_TF$xAxis_or_radius

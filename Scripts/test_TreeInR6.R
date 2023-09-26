@@ -320,7 +320,7 @@ treeCustomizedDrawer(tree = intuitiveTree,
 
 ## Dispaly the leaf name --------------------------------
 # First, generate the tree
-global_pars$blank_area_ratio$r <- 0.2
+set_global_pars('blank_area_ratio', list(l = 0.05, r = 0.2, t = 0.1, b = 0.1))
 hc <- hclust(dist(USArrests), "ave")
 dendrogram <- as.dendrogram(hc)
 intuitiveTree <- process_dendrogram2intuitiveTree(dendrogram)
@@ -365,7 +365,7 @@ treeCustomizedDrawer(tree = intuitiveTree,
 
 ### Any ggtree picture can be drawed  --------------------------------
 # First, generate the tree
-global_pars$blank_area_ratio$r <- 0.2
+set_global_pars('blank_area_ratio', list(l = 0.05, r = 0.2, t = 0.1, b = 0.1))
 hc <- hclust(dist(USArrests), "ave")
 dendrogram <- as.dendrogram(hc, hang = 0.1)
 
