@@ -36,6 +36,8 @@ You can also install it from the `gitee`.
 
 ``` r
 # install.packages("remotes")
+# install.packages("git2r")
+# The two package above should be installed
 remotes::install_git("https://gitee.com/yudalang3/PathwayI.git")
 ```
 

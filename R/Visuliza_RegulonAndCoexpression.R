@@ -259,21 +259,54 @@ half_unit_coexpression_node = 0.5) {
 }
 
 
-#' Display the TF targets and co expressed genes.
+#' Display the TF, its targets and co expressed genes.
 #'
-#' @param data a list
-#' @param buttomStyleBezier
+#' @param data a list contains three elements, the name is fixed, the values are the char vector.
+#' @param buttomStyleBezier whether draw the buttom outbound with the bezier lines.
 #'
 #' @description
-#' The input data list needs three elements, the name is fiexed: TF, targets and coexpression.
+#' The input data list needs three elements, the name is fiexed: TF, targets and coexpression genes.
 #'
+#' For example, the default value, we could generate the data with the following codes:
+#'
+#' <pre>
+#' data = list(
+#'     TF = "TF1",
+#'     targets = paste0("g", c(4, 1, 9, 8, 3, 2, 6, 7, 5)),
+#'     coexpression = c(paste0("g", 1:7), paste0("k", 1:3))
+#' )
+#' </pre>
+#'
+#' @details
+#'
+#' 1. The string vector corresponding to coexprerssion is the gene that has a co-expression relationship with the TF, which may or may not belong to the target gene of the TF.
+#'
+#' 2. The string vector given after targets is all the target genes of the TF.
+#'
+#' 3. Note that in the content of coexpression, the strings that belong to targets are placed in the first part, rather than being shuffled.
 #'
 #' @export
 #'
 #' @examples
+#' # example1
 #' display_TF_targets_coexpress()
-#' display_TF_targets_coexpress(buttomStyleBezier = F)
-#'
+#' display_TF_targets_coexpress(buttomStyleBezier = T)
+#' # example2
+#' set_global_pars('fontsize', 7)
+#' data = list(
+#'   TF = "TCF/LEF",
+#'   targets = c('Axin2','TCF7','ST7','BZRAP1', 'PDK2', 'PIK3C2A', 'CLK1' , 'SERPINB1','SPEN','NUCB2','JMJD6','DGKD','MLLT10'),
+#'   coexpression = c('SPEN','NUCB2','JMJD6','DGKD','MLLT10','AXIN2','PIK3C2A','SERPINB1','TP53','CXCL1','INS')
+#' )
+#' display_TF_targets_coexpress(data = data,buttomStyleBezier = T)
+#' # example 3
+#' set_global_pars('fontsize', 12)
+#' data = list(
+#'   TF = "TF1",
+#'   targets = paste0("g", 1:10),
+#'   coexpression = c(paste0("g", 1:4), paste0("k", 1:4))
+#' )
+#' display_TF_targets_coexpress(data = data)
 display_TF_targets_coexpress <- function(data = list(
   TF = "TF1",
   targets = paste0("g", c(4, 1, 9, 8, 3, 2, 6, 7, 5)),

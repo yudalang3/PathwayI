@@ -70,7 +70,8 @@ dendrogram <- as.dendrogram(hc)
 intuitiveTree <- process_dendrogram2intuitiveTree(dendrogram)
 displayTheTree(intuitiveTree$rootNode)
 
-intuitiveTree$innerRadius <- 1
+intuitiveTree$innerRadius <- 2
+intuitiveTree$outterRadius <- 0.7
 circLayoutDesigner <- CircularLayoutDesigner$new();
 circLayoutDesigner$calculate(intuitiveTree)
 circLayoutDesigner$plotTree(intuitiveTree)
@@ -78,6 +79,8 @@ circLayoutDesigner$plotTree(intuitiveTree)
 rectLayoutDesigner<- RectangularLayoutDesigner$new()
 rectLayoutDesigner$calculate(intuitiveTree)
 rectLayoutDesigner$plotTree(intuitiveTree)
+
+plot(dendrogram, horiz = T)
 
 
 # customized tree drawer

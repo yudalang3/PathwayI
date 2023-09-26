@@ -100,7 +100,7 @@ GraphicTree <- R6Class(classname = "GraphicTree", public = list(
   startDegree = 0,
   extendDegree = 360,
   innerRadius = 0.1,
-  outterRadius = 0.5,
+  outterRadius = - 1,
   direction = 0,
   xCenter = 0.5,
   yCenter = 0.5,
