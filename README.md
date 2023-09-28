@@ -23,12 +23,21 @@ You can also install it from the `gitee`.
 
 ``` r
 # install.packages("remotes")
+# install.packages("git2r")
+# The two package above should be installed
 remotes::install_git("https://gitee.com/yudalang3/PathwayI.git")
 ```
 
+## Vesion informations:
+
+Here we only record the major features.
+
+-   Version 0.0.0.1000 released the first draft of the package.
+-   Version 0.0.0.1003 add the affine transformer and simulate the simplest model of lipid bilayer.
+
 ## More information:
 
-Please keep eyes on me for the first news.
+**Please keep eyes on me for the first news.**
 
 <figure>
 
