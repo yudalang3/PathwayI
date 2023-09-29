@@ -4,7 +4,7 @@
 \alias{simulate_lipid_bilayer_model}
 \title{Simulate the lipid bilayer model.}
 \usage{
-simulate_lipid_bilayer_model()
+simulate_lipid_bilayer_model(yAxisReflected = F)
 }
 \value{
 a list

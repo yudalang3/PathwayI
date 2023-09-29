@@ -193,11 +193,11 @@ do_reflection_yAxis <- function(mat){
 #' Simulate the lipid bilayer model.
 #'
 #' @return a list
-#' @export
+#' @###export
 #'
 #' @examples
 #' simulate_lipid_bilayer_model()
-simulate_lipid_bilayer_model <- function() {
+simulate_lipid_bilayer_model <- function(yAxisReflected = F) {
   from_angle <- -160
   circle_points <- produce_model_coordinate_points(from = from_angle, by = 1, to = from_angle +360, radius = 0.3)
   x_horizontal_distance <- 0.1
@@ -213,7 +213,21 @@ simulate_lipid_bilayer_model <- function() {
   right_line <- left_line
   right_line[1,] <- right_line[1,] + 2 * abs(first_point[1])
 
-  list(left_line = left_line, right_line = right_line,  circle_points = circle_points)
+  # Adjust for the center
+  xAdjust <- 0; yAdjust <- abs(last_point[2]) * 1.01
+  left_line[2, ] <- left_line[2, ] + yAdjust
+  right_line[2, ] <- right_line[2, ] + yAdjust
+  circle_points[2, ] <- circle_points[2, ] + yAdjust
+
+
+  if (yAxisReflected) {
+    left_line = do_reflection_xAxis(left_line)
+    right_line = do_reflection_xAxis(right_line)
+    circle_points = do_reflection_xAxis(circle_points)
+  }
+
+  ret <- list(left_line = left_line, right_line = right_line,  circle_points = circle_points)
+  return(ret)
 }
 
 
