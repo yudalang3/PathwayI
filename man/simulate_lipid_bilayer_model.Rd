@@ -8,6 +8,7 @@ simulate_lipid_bilayer_model(yAxisReflected = F)
 }
 \value{
 a list
+##@###export
 }
 \description{
 Simulate the lipid bilayer model.

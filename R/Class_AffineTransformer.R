@@ -1,20 +1,8 @@
 
-TRANSFORM_MAT_TEMPELATE <- matrix(c(1,0,0,0,1,0,0,0,1), byrow = T, ncol = 3)
 
+TRANSFORM_MAT_TEMPELATE <-
+  matrix(c(1, 0, 0, 0, 1, 0, 0, 0, 1), byrow = T, ncol = 3)
 
-produce_model_coordinate_points <- function(from =0, by = 5, to = 90, break_points = NULL, radius = 1 ){
-
-  if (is.null(break_points)) {
-    radians <- seq.int( from = from, by = by, to = to) * ONE_DEGREE_IN_RADIAN
-  }else {
-    radians <- break_points
-  }
-
-  cc <- exp((1i) * radians)
-  matrixs <- rbind(Im(cc) * radius , Re(cc) * radius)
-
-  return(matrixs)
-}
 
 
 #' The core process to do the affine transformation.
@@ -55,10 +43,32 @@ produce_model_coordinate_points <- function(from =0, by = 5, to = 90, break_poin
 #' grid.lines(x =mat[1,], y = mat[2,], default.units = 'in' )
 #' after_mat <- do_affine_transformation(mat,transform_mat)
 #' grid.lines(x =after_mat[1,], y = after_mat[2,], default.units = 'in' )
-do_affine_transformation <- function(mat, transform_mat){
-  ret <- transform_mat %*% rbind(mat,1)
-  return(ret[1:2,])
+do_affine_transformation <- function(mat, transform_mat) {
+  ret <- transform_mat %*% rbind(mat, 1)
+  return(ret[1:2, ])
 }
+
+#' First scale, next rotate and finally translate.
+#'
+#' @param mat the input matrix
+#' @param one_scaler scaler for width and height
+#' @param theta angle in radian
+#' @param moveX translate x
+#' @param moveY translate y
+#'
+#' @return the transformed matrix
+#' @export
+#'
+#' @examples
+#' do_scale_rotate_translate_affineTransfor( your requirement)
+do_scale_rotate_translate_affineTransfor <-
+  function(mat, one_scaler, theta, moveX, moveY) {
+    ret <-
+      get_translate_transform_mat(moveX, moveY) %*% get_rotate_transform_mat(theta) %*% get_scale_transform_mat(one_scaler, one_scaler)
+
+    ret <- do_affine_transformation(mat = mat,transform_mat = ret)
+    return(ret)
+  }
 
 #' The core process to do the translate affine transformation.
 #'
@@ -73,13 +83,27 @@ do_affine_transformation <- function(mat, transform_mat){
 #' mat <- rbind(c(1,0,1),c(2,1,0))
 #' do_translate_affine(mat, 1,1)
 #'
-do_translate_affine <- function(mat, moveX = 1, moveY = 1){
-  transform_mat <- TRANSFORM_MAT_TEMPELATE
-  transform_mat[1:2, 3] <- c(moveX,moveY)
+do_translate_affine <- function(mat, moveX = 1, moveY = 1) {
+  transform_mat <- get_translate_transform_mat(moveX,moveY);
   ret <- do_affine_transformation(mat, transform_mat)
   return(ret)
 }
 
+#' The low-level function for translate transforming
+#'
+#' @param moveX the x move distance
+#' @param moveY the y move distance
+#'
+#' @return the transforming matrix not the transformed matrix
+#' @export
+#'
+#' @examples
+#' get_translate_transform_mat(2,1)
+get_translate_transform_mat <- function(moveX = 1, moveY = 1) {
+  transform_mat <- TRANSFORM_MAT_TEMPELATE
+  transform_mat[1:2, 3] <- c(moveX, moveY)
+  return(transform_mat)
+}
 
 
 # Complete all transformation ---------------------------------------------
@@ -99,12 +123,30 @@ do_translate_affine <- function(mat, moveX = 1, moveY = 1){
 #' mat <- rbind(c(1,0,1),c(2,1,0))
 #' do_scale_affine(mat, 1,1)
 #'
-do_scale_affine <- function(mat, scaleWidth = 1, scaleHeight = 1){
-  transform_mat <- TRANSFORM_MAT_TEMPELATE
-  transform_mat[1,1] <- scaleWidth
-  transform_mat[2,2] <- scaleHeight
+do_scale_affine <- function(mat,
+                            scaleWidth = 1,
+                            scaleHeight = 1) {
+  transform_mat <- get_scale_transform_mat(scaleWidth,scaleHeight)
   ret <- do_affine_transformation(mat, transform_mat)
   return(ret)
+}
+
+#' The low-level function for scale transforming
+#'
+#' @param scaleWidth scale in width
+#' @param scaleHeight scale in height
+#'
+#' @return the transforming matrix not the transformed matrix
+#' @export
+#'
+#' @examples
+#' get_scale_transform_mat(2,1)
+get_scale_transform_mat <- function(scaleWidth = 1,
+                                    scaleHeight = 1) {
+  transform_mat <- TRANSFORM_MAT_TEMPELATE
+  transform_mat[1, 1] <- scaleWidth
+  transform_mat[2, 2] <- scaleHeight
+  return(transform_mat)
 }
 
 #' The core process to do the rotate affine transformation.
@@ -119,16 +161,29 @@ do_scale_affine <- function(mat, scaleWidth = 1, scaleHeight = 1){
 #' mat <- rbind(c(1,0,1),c(2,1,0))
 #' do_rotate_affine(mat, 1,1)
 #'
-do_rotate_affine <- function(mat, theta = 0){
+do_rotate_affine <- function(mat, theta = 0) {
+  transform_mat <- get_rotate_transform_mat(theta)
+  ret <- do_affine_transformation(mat, transform_mat)
+  return(ret)
+}
 
+#' The low-level function for rotate transforming
+#'
+#' @param theta the rotate angle, in radian
+#'
+#' @return the transforming matrix not the transformed matrix
+#' @export
+#'
+#' @examples
+#' get_scale_transform_mat(2,1)
+get_rotate_transform_mat <- function(theta = 0) {
   s <- sin(theta)
   c <- cos(theta)
 
   transform_mat <- TRANSFORM_MAT_TEMPELATE
-  transform_mat[1, 1:2] <- c(c,s)
+  transform_mat[1, 1:2] <- c(c, s)
   transform_mat[2, 1:2] <- c(-s, c)
-  ret <- do_affine_transformation(mat, transform_mat)
-  return(ret)
+  return(transform_mat)
 }
 
 #' The core process to do the reflection affine transformation.
@@ -142,10 +197,10 @@ do_rotate_affine <- function(mat, theta = 0){
 #' mat <- rbind(c(1,0,1),c(2,1,0))
 #' do_reflection_origin(mat)
 #'
-do_reflection_origin <- function(mat){
+do_reflection_origin <- function(mat) {
   transform_mat <- TRANSFORM_MAT_TEMPELATE
-  transform_mat[1,1] <- -1
-  transform_mat[2,2] <- -1
+  transform_mat[1, 1] <- -1
+  transform_mat[2, 2] <- -1
   ret <- do_affine_transformation(mat, transform_mat)
   return(ret)
 }
@@ -162,9 +217,9 @@ do_reflection_origin <- function(mat){
 #' mat <- rbind(c(1,0,1),c(2,1,0))
 #' do_reflection_origin(mat)
 #'
-do_reflection_xAxis <- function(mat){
+do_reflection_xAxis <- function(mat) {
   transform_mat <- TRANSFORM_MAT_TEMPELATE
-  transform_mat[2,2] <- -1
+  transform_mat[2, 2] <- -1
   ret <- do_affine_transformation(mat, transform_mat)
   return(ret)
 }
@@ -180,9 +235,9 @@ do_reflection_xAxis <- function(mat){
 #' mat <- rbind(c(1,0,1),c(2,1,0))
 #' do_reflection_origin(mat)
 #'
-do_reflection_yAxis <- function(mat){
+do_reflection_yAxis <- function(mat) {
   transform_mat <- TRANSFORM_MAT_TEMPELATE
-  transform_mat[1,1] <- -1
+  transform_mat[1, 1] <- -1
   ret <- do_affine_transformation(mat, transform_mat)
   return(ret)
 }
@@ -193,31 +248,39 @@ do_reflection_yAxis <- function(mat){
 #' Simulate the lipid bilayer model.
 #'
 #' @return a list
-#' @###export
+#' ##@###export
 #'
 #' @examples
 #' simulate_lipid_bilayer_model()
 simulate_lipid_bilayer_model <- function(yAxisReflected = F) {
   from_angle <- -160
-  circle_points <- produce_model_coordinate_points(from = from_angle, by = 1, to = from_angle +360, radius = 0.3)
+  circle_points <-
+    produce_model_coordinate_points(
+      from = from_angle,
+      by = 1,
+      to = from_angle + 360,
+      radius = 0.3
+    )
   x_horizontal_distance <- 0.1
   y_vertical_distance <- 0.4
 
-  first_point <- circle_points[,1]
-  middle_point <- first_point + c(-x_horizontal_distance, - y_vertical_distance)
+  first_point <- circle_points[, 1]
+  middle_point <-
+    first_point + c(-x_horizontal_distance, -y_vertical_distance)
 
   last_point <- first_point
   last_point[2] <- middle_point[2] - y_vertical_distance
 
   left_line <- cbind(first_point, middle_point, last_point)
   right_line <- left_line
-  right_line[1,] <- right_line[1,] + 2 * abs(first_point[1])
+  right_line[1, ] <- right_line[1, ] + 2 * abs(first_point[1])
 
   # Adjust for the center
-  xAdjust <- 0; yAdjust <- abs(last_point[2]) * 1.01
-  left_line[2, ] <- left_line[2, ] + yAdjust
-  right_line[2, ] <- right_line[2, ] + yAdjust
-  circle_points[2, ] <- circle_points[2, ] + yAdjust
+  xAdjust <- 0
+  yAdjust <- abs(last_point[2]) * 1.01
+  left_line[2,] <- left_line[2,] + yAdjust
+  right_line[2,] <- right_line[2,] + yAdjust
+  circle_points[2,] <- circle_points[2,] + yAdjust
 
 
   if (yAxisReflected) {
@@ -226,8 +289,31 @@ simulate_lipid_bilayer_model <- function(yAxisReflected = F) {
     circle_points = do_reflection_xAxis(circle_points)
   }
 
-  ret <- list(left_line = left_line, right_line = right_line,  circle_points = circle_points)
+  ret <-
+    list(
+      left_line = left_line,
+      right_line = right_line,
+      circle_points = circle_points,
+      head_diameter = 0.6
+    )
   return(ret)
 }
 
+produce_model_coordinate_points <-
+  function(from = 0,
+           by = 5,
+           to = 90,
+           break_points = NULL,
+           radius = 1) {
+    if (is.null(break_points)) {
+      radians <-
+        seq.int(from = from, by = by, to = to) * ONE_DEGREE_IN_RADIAN
+    } else {
+      radians <- break_points
+    }
 
+    cc <- exp((1i) * radians)
+    matrixs <- rbind(Im(cc) * radius , Re(cc) * radius)
+
+    return(matrixs)
+  }

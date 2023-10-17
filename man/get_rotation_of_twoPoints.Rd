@@ -7,13 +7,28 @@
 get_rotation_of_twoPoints(x1, y1, x2, y2)
 }
 \arguments{
-\item{y2}{}
+\item{x1}{point1 x}
+
+\item{y1}{point1 y}
+
+\item{x2}{point2 x}
+
+\item{y2}{point2 y}
 }
 \value{
 the rotation angle in radian
 }
 \description{
-Get the rotation of the two points.
+Note the return angle is already between 0 <= angle <= 90.\if{html}{\out{
+<pre>
+              point2 A.(x2,y2)       |       A
+                                     |
+   point1 B.(x1,y1)            C.    |    D       B           C
+</pre>
+}}
+
+
+Angle ABC is the returned value for left picture; angle ABD is the returned value in right picture
 }
 \examples{
 get_rotation_of_twoPoints(0,0,1,1)
