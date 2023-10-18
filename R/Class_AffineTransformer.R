@@ -299,6 +299,19 @@ simulate_lipid_bilayer_model <- function(yAxisReflected = F) {
   return(ret)
 }
 
+#' Produce the model circle points
+#'
+#' @param from : from angle in degree
+#' @param by : by angle in degree
+#' @param to : to angle in degree
+#' @param break_points the angles points in degree
+#' @param radius the radius of circle
+#'
+#' @return
+#' @export a 2 x n matrix, first row is x axis, second row is y axis.
+#'
+#' @examples
+#' produce_model_coordinate_points()
 produce_model_coordinate_points <-
   function(from = 0,
            by = 5,

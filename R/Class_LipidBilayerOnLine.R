@@ -69,14 +69,7 @@ Phospholipid_drawer <- R6Class(
     #'
     draw_lipid_along_curve = function(x, y, lastDraw = F) {
 
-      #check
-      len_ofX <- length(x)
-      if (length(y) != len_ofX) {
-        stop("The length of x and y should be equal.")
-      }
-      if (len_ofX < 2) {
-        stop("The number should greater than 2.")
-      }
+      checkCurvePoints(x,y)
 
       x_distance <- abs(x[2] - x[1])
       y_distance <- abs(y[2] - y[1])
@@ -168,30 +161,6 @@ Phospholipid_drawer <- R6Class(
         do_scale_rotate_translate_affineTransfor(points$left_line, scaler, theta, moveX, moveY)
       right_line <-
         do_scale_rotate_translate_affineTransfor(points$right_line, scaler, theta, moveX, moveY)
-
-
-      # circle_points <-
-      #   do_scale_affine(points$circle_points, scaler, scaler)
-      # left_line <-
-      #   do_scale_affine(points$left_line, scaler, scaler)
-      # right_line <-
-      #   do_scale_affine(points$right_line, scaler, scaler)
-      #
-      #
-      # circle_points <-
-      #   do_rotate_affine(circle_points, theta = theta)
-      # left_line <-
-      #   do_rotate_affine(left_line, theta = theta)
-      # right_line <-
-      #   do_rotate_affine(right_line, theta = theta)
-      #
-      #
-      # circle_points <-
-      #   do_translate_affine(circle_points, moveX, moveY)
-      # left_line <-
-      #   do_translate_affine(left_line, moveX, moveY)
-      # right_line <-
-      #   do_translate_affine(right_line, moveX, moveY)
 
       grid.lines(circle_points[1, ], circle_points[2, ], default.units = 'in')
       grid.lines(left_line[1, ], left_line[2, ], default.units = 'in')

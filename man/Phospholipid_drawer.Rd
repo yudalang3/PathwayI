@@ -46,7 +46,7 @@ It will handle the angle automatically. Note the denser the dots, the more they 
 
 Draw one unit lipid model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Phospholipid_drawer$draw_lipid_along_curve(x, y)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Phospholipid_drawer$draw_lipid_along_curve(x, y, lastDraw = F)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -55,6 +55,8 @@ Draw one unit lipid model
 \item{\code{x}}{x values}
 
 \item{\code{y}}{y values}
+
+\item{\code{lastDraw}}{should draw last model, default F}
 }
 \if{html}{\out{</div>}}
 }
