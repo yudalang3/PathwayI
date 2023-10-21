@@ -51,10 +51,11 @@ do_affine_transformation <- function(mat, transform_mat) {
 #' First scale, next rotate and finally translate.
 #'
 #' @param mat the input matrix
-#' @param one_scaler scaler for width and height
 #' @param theta angle in radian
 #' @param moveX translate x
 #' @param moveY translate y
+#' @param scaleWidth scale of width
+#' @param scaleHeight  scale of height
 #'
 #' @return the transformed matrix
 #' @export
@@ -62,9 +63,9 @@ do_affine_transformation <- function(mat, transform_mat) {
 #' @examples
 #' do_scale_rotate_translate_affineTransfor( your requirement)
 do_scale_rotate_translate_affineTransfor <-
-  function(mat, one_scaler, theta, moveX, moveY) {
+  function(mat, scaleWidth = 1,scaleHeight = 1, theta, moveX, moveY) {
     ret <-
-      get_translate_transform_mat(moveX, moveY) %*% get_rotate_transform_mat(theta) %*% get_scale_transform_mat(one_scaler, one_scaler)
+      get_translate_transform_mat(moveX, moveY) %*% get_rotate_transform_mat(theta) %*% get_scale_transform_mat(scaleWidth, scaleHeight)
 
     ret <- do_affine_transformation(mat = mat,transform_mat = ret)
     return(ret)
@@ -299,7 +300,12 @@ simulate_lipid_bilayer_model <- function(yAxisReflected = F) {
   return(ret)
 }
 
-#' Produce the model circle points
+#' Produce the model circle points.
+#'
+#' @description
+#' It has many applications:
+#' 1. produce poly regular shapes: like triangles, rectangular and so on.
+#' 2. just drow a circle, with points.
 #'
 #' @param from : from angle in degree
 #' @param by : by angle in degree
@@ -307,8 +313,12 @@ simulate_lipid_bilayer_model <- function(yAxisReflected = F) {
 #' @param break_points the angles points in degree
 #' @param radius the radius of circle
 #'
-#' @return
-#' @export a 2 x n matrix, first row is x axis, second row is y axis.
+#' @details
+#' The return values formats are:
+#' a 2 x n matrix, first row is x axis, second row is y axis.
+#'
+#' @return matrix, see details
+#' @export
 #'
 #' @examples
 #' produce_model_coordinate_points()

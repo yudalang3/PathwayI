@@ -4,12 +4,21 @@
 \alias{do_scale_rotate_translate_affineTransfor}
 \title{First scale, next rotate and finally translate.}
 \usage{
-do_scale_rotate_translate_affineTransfor(mat, one_scaler, theta, moveX, moveY)
+do_scale_rotate_translate_affineTransfor(
+  mat,
+  scaleWidth = 1,
+  scaleHeight = 1,
+  theta,
+  moveX,
+  moveY
+)
 }
 \arguments{
 \item{mat}{the input matrix}
 
-\item{one_scaler}{scaler for width and height}
+\item{scaleWidth}{scale of width}
+
+\item{scaleHeight}{scale of height}
 
 \item{theta}{angle in radian}
 

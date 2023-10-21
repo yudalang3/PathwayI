@@ -1,3 +1,4 @@
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 This is a package aim to visualize the biological pathway.
@@ -5,10 +6,11 @@ This is a package aim to visualize the biological pathway.
 # PathwayIlluminator
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
-The goal of `PathwayIlluminator` is to make computational analysis more exciting! It provides convenience functions to make some directl results analysis.
+The goal of `PathwayIlluminator` is to make computational analysis more
+exciting! It provides convenience functions to make some directl results
+analysis.
 
 ## Installation
 
@@ -32,21 +34,19 @@ remotes::install_git("https://gitee.com/yudalang3/PathwayI.git")
 
 Here we only record the major features.
 
--   Version 0.0.0.1000 released the first draft of the package.
--   Version 0.0.0.1003 add the affine transformer and simulate the simplest model of lipid bilayer.
+- Version 0.0.0.1000 released the first draft of the package.
+- Version 0.0.0.1003 add the affine transformer and simulate the
+  simplest model of lipid bilayer.
+- Version 0.0.0.1004 put forward another way to draw the phospholipid
+  bilayer, while some flaws exists.
+- Version 0.0.0.1005 implements lots of phospholipid bilayer models,
+  from the simplest two lines and the most complex curves.
 
 ## More information:
 
 **Please keep eyes on me for the first news.**
 
 <figure>
-
-<img src="2023-09-26%2002-10-31.png" alt="Wechat subscription"/>
-
-<figcaption aria-hidden="true">
-
-Wechat subscription
-
-</figcaption>
-
+<img src="2023-09-26%2002-10-31.png" alt="Wechat subscription" />
+<figcaption aria-hidden="true">Wechat subscription</figcaption>
 </figure>

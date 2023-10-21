@@ -56,7 +56,11 @@ checkCurvePoints <- function(x, y) {
 #' @export
 #'
 #' @examples
+#' x <- 1:5
+#' y <- x ^ (1 / 3) + 2
+#' do_bilateral_extension_alongCurve(x,y,d = 1.2)
 do_bilateral_extension_alongCurve <- function(x, y, d = 1) {
+
   len_ofX <- checkCurvePoints(x, y)
 
   x_a <- x[1:(len_ofX - 1)]
@@ -66,6 +70,18 @@ do_bilateral_extension_alongCurve <- function(x, y, d = 1) {
 
   ## qq = - 1 / k
   qq <- (x_a - x_b) / (y_b - y_a)
+
+  if(any(is.infinite(qq))){
+    ret <-
+      list(
+        xPrime_1 = x_a,
+        yPrime_1 = y_a + d,
+        xPrime_2 = x_a,
+        yPrime_2 = y_a - d
+      )
+
+    return(ret)
+  }
 
   t_square <- d * d / (1 + qq * qq)
 
@@ -113,4 +129,68 @@ do_bilateral_extension_alongCurve <- function(x, y, d = 1) {
 #' distance(0,0,1,1)
 distance <- function(x0, y0, x1, y1) {
   return(sqrt((x1 - x0) ^ 2 + (y1 - y0) ^ 2))
+}
+
+#' Get the rotation of the two points.
+#'
+#' @param x1 point1 x
+#' @param y1 point1 y
+#' @param x2 point2 x
+#' @param y2 point2 y
+#'
+#' @description
+#' Note the return angle is already between 0 <= angle <= 90.
+#'
+#' <pre>
+#'               point2 A.(x2,y2)       |       A
+#'                                      |
+#'    point1 B.(x1,y1)            C.    |    D       B           C
+#' </pre>
+#' Angle ABC is the returned value for left picture; angle ABD is the returned value in right picture
+#'
+#'
+#' @return the rotation angle in radian
+#' @export
+#'
+#' @examples
+#' get_rotation_of_twoPoints(0,0,1,1)
+get_rotation_of_twoPoints <- function(x1, y1, x2, y2) {
+  # x_distance <- x1 - x2
+  #
+  # if (x_distance > 0) {
+  #   direction <- -1
+  # } else {
+  #   direction <- -1
+  # }
+  #
+  # horizontal_distance <- abs(x_distance)
+  # vertical_distance <- abs(y1 - y2)
+  #
+  # if (horizontal_distance == 0) {
+  #   theta <- 90 * ONE_DEGREE_IN_RADIAN
+  #
+  # } else {
+  #   theta <- atan2(vertical_distance, horizontal_distance)
+  # }
+  #
+  # return(direction * theta)
+
+  return(atan2( y1 - y2, x2 - x1))
+}
+
+#' Draw the 2xn matrix in points
+#'
+#' @param default.units default is in
+#' @param ... the 2xn matrix list
+#'
+#' @return null
+#' @export
+#'
+#' @examples
+#' draw_2xn_matrix_points(rbind(1:5,rep(3,5)))
+draw_2xn_matrix_points <- function(... , default.units = 'in'){
+  all_objs <- list(...)
+  walk(all_objs, function(x){
+    grid.lines(x[1,],x[2,],default.units = default.units)
+  })
 }

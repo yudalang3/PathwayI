@@ -3,10 +3,10 @@ w_and_h <- par('din')
 xx <- seq(from = 1, to = w_and_h[1] - 1, length.out = 40)
 # the simplest form of the line
 # y <- -x + w_and_h[2]
-yy <- xx + 0.5
+# yy <- xx + 0.5
 # yy <- xx^ (1/3) + 0.5
-
 # yy <- sin(xx) + 3
+yy <- rep(2,length(xx))
 
 # aa <- produce_model_coordinate_points(from = 0,by = 5,to = 360,radius = 2)
 # xx <- aa[1,] + 3
@@ -15,6 +15,8 @@ yy <- xx + 0.5
 grid.newpage()
 
 xyPrime <- do_bilateral_extension_alongCurve(xx,yy,d = 0.2)
+xyPrime <- do_bilateral_extension_alongCurve(rep(2,5),1:5,d = 0.2)
+xyPrime <- do_bilateral_extension_alongCurve(1:5,1:5,d = 0.2)
 
 x = xyPrime$xPrime_1;y = xyPrime$yPrime_1
 len_ofX <- checkCurvePoints(x, y)
@@ -96,3 +98,4 @@ grid.circle(x_b,y_b, default.units = 'in', r = half_distance_all,gp = lipid_head
 #
 
 grid.lines(xx,yy, default.units = 'in',gp = gpar(col = 'white', lwd = 2))
+

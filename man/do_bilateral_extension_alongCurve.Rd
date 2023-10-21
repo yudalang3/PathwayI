@@ -19,3 +19,8 @@ a list of two line points
 \description{
 Employ the bilateral extansion along a curve
 }
+\examples{
+x <- 1:5
+y <- x ^ (1 / 3) + 2
+do_bilateral_extension_alongCurve(x,y,d = 1.2)
+}
