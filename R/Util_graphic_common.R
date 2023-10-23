@@ -1,4 +1,8 @@
+#' Define the constont values
 ONE_DEGREE_IN_RADIAN <- pi / 180
+degree_of_180_inRadian <- 180 * ONE_DEGREE_IN_RADIAN
+degree_of_90_inRadian <- 90 * ONE_DEGREE_IN_RADIAN
+
 #' Polar coordinates to Cartesian coordinates.
 #' @description
 #' The function supports the vectorised invoke usage.

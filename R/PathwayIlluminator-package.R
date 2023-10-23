@@ -8,5 +8,6 @@
 #' @importFrom gridBezier BezierPoints
 #' @importFrom gridBezier grid.Bezier
 #' @importFrom R6 R6Class
+#' @importFrom gridGeometry polyclipGrob
 ## usethis namespace: end
 NULL

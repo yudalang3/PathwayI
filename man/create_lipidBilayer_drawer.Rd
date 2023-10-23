@@ -4,7 +4,7 @@
 \alias{create_lipidBilayer_drawer}
 \title{quick function to draw the instance.}
 \usage{
-create_lipidBilayer_drawer(lipidModelIndex = 1)
+create_lipidBilayer_drawer(lipidModelIndex = 1, draw_circle_head = F)
 }
 \arguments{
 \item{lipidModelIndex}{the index of model}

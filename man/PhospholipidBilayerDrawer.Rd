@@ -23,8 +23,6 @@ painter$draw_lipid_along_curve(x = x, y = y)
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{shape_scaling_factor}}{The scaling parameter, bigger value for big lipid in your eyes.}
-
 \item{\code{current_lipid_model}}{The model of the lipid}
 
 \item{\code{lipid_head_par}}{The graphics par}
@@ -32,6 +30,8 @@ painter$draw_lipid_along_curve(x = x, y = y)
 \item{\code{desired_hight}}{The height in inch's}
 
 \item{\code{draw_circle_head}}{most draw head as a circle in a curve}
+
+\item{\code{draw_only_upLayer}}{draw only the up layer}
 }
 \if{html}{\out{</div>}}
 }
@@ -54,7 +54,7 @@ It will handle the angle automatically. Note the denser the dots, the more they 
 
 Draw one unit lipid model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PhospholipidBilayerDrawer$draw_lipid_along_curve(lineX, lineY, lastDraw = F)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PhospholipidBilayerDrawer$draw_lipid_along_curve(lineX, lineY)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

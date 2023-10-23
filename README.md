@@ -41,6 +41,7 @@ Here we only record the major features.
   bilayer, while some flaws exists.
 - Version 0.0.0.1005 implements lots of phospholipid bilayer models,
   from the simplest two lines and the most complex curves.
+- Version 0.0.0.1006 implements a simple general signaling pathway.
 
 ## More information:
 

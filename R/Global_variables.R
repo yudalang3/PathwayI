@@ -38,3 +38,42 @@ calculate_blankArea <- function(blank_area_ratio = global_pars[['blank_area_rati
        b = height * blank_area_ratio$b
        )
 }
+
+
+## Global BioGraphicNodes
+global_bioGraphics_nodes <- new.env()
+
+#' get_global_bioGraphics_nodes_list
+#'
+#' @return a list
+#' @export
+#'
+#' @examples
+#' get_global_bioGraphics_nodes_list() |> names()
+get_global_bioGraphics_nodes_list <- function() {
+  return(global_bioGraphics_nodes)
+}
+
+#' clear_global_bioGraphics_nodes_list
+#'
+#' @export
+#'
+#' @examples
+#' clear_global_bioGraphics_nodes_list()
+clear_global_bioGraphics_nodes_list <- function() {
+  rm(list = ls(envir = global_bioGraphics_nodes),envir = global_bioGraphics_nodes)
+}
+
+#' Register global bioGraphics nodes list
+#'
+#' @param name your grob name
+#' @param value a grob
+#'
+#' @export
+#'
+#' @examples
+#' register_global_bioGraphics_nodes_list('name', grob)
+register_global_bioGraphics_nodes_list <- function(name, value){
+  global_bioGraphics_nodes[[name]] <- value;
+  invisible()
+}

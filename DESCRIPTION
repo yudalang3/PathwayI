@@ -1,6 +1,6 @@
 Package: PathwayIlluminator
 Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.1005
+Version: 0.0.0.1006
 Authors@R: 
     person("Dalang", "Yu", , "dalangyusci@gmail.com", role = c("aut", "cre"))
 Description: The beautifull pathway drawer.
@@ -15,7 +15,8 @@ Imports:
     grid,
     gridBezier,
     purrr,
-    R6
+    R6,
+    gridGeometry
 Depends: 
     R (>= 2.10)
 LazyData: true

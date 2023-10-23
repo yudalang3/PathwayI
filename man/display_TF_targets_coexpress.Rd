@@ -7,7 +7,8 @@
 display_TF_targets_coexpress(
   data = list(TF = "TF1", targets = paste0("g", c(4, 1, 9, 8, 3, 2, 6, 7, 5)),
     coexpression = c(paste0("g", 1:7), paste0("k", 1:3))),
-  buttomStyleBezier = F
+  buttomStyleBezier = F,
+  paintArea = NULL
 )
 }
 \arguments{

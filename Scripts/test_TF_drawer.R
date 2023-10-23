@@ -1,6 +1,10 @@
 # example1
 display_TF_targets_coexpress()
 display_TF_targets_coexpress(buttomStyleBezier = T)
+##
+
+##左上角是 （1,3） 宽度为5， 高度为4
+display_TF_targets_coexpress(buttomStyleBezier = T,paintArea = create_rectangle(l=1,t=0.5,r=1,b=1))
 # example2
 set_global_pars('fontsize', 7)
 data = list(

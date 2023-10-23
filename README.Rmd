@@ -49,7 +49,7 @@ Here we only record the major features.
 * Version 0.0.0.1003 add the affine transformer and simulate the simplest model of lipid bilayer.
 * Version 0.0.0.1004 put forward another way to draw the phospholipid bilayer, while some flaws exists.
 * Version 0.0.0.1005 implements lots of phospholipid bilayer models, from the simplest two lines and the most complex curves.
-
+* Version 0.0.0.1006 implements a simple general signaling pathway.
 
 ## More information:
 

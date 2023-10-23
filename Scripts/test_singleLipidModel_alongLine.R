@@ -102,7 +102,7 @@ produce_circle_lipid <- function(from = 0, to = 365){
   y <- df_round[2,]
   # y <- x
   grid.newpage()
-  painter <- Phospholipid_drawer$new()
+  painter <- create_lipidBilayer_drawer()
   painter$draw_circle_head <- T
   painter$current_lipid_model <- lipid_models[[1]];
   painter$draw_lipid_along_curve(lineX = x, lineY = y)

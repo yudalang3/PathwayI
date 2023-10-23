@@ -17,6 +17,63 @@ setMethod("show", "Point", function(object) {
 })
 
 
+# 定义 Point 类
+setClass("Rectangle",
+         slots = list(x = "numeric",
+                      y = "numeric",
+                      w = "numeric",
+                      h = "numeric"))
+
+# 创建 Point 对象的构造函数
+setMethod("initialize", "Rectangle",
+          function(.Object, x = 0, y = 0 , w = 1, h = 1) {
+            .Object@x <- x
+            .Object@y <- y
+            .Object@w <- w
+            .Object@h <- h
+            return(.Object)
+          })
+
+# 创建显示 Point 对象的方法
+setMethod("show", "Rectangle", function(object) {
+  cat(
+    sprintf(
+      "Rectangle (x = %d, y = %d, w = %d, h = %d)\n",
+      object@x,
+      object@y,
+      object@w,
+      object@h
+    )
+  )
+})
+
+#' Create the Rectangle object.
+#'
+#' @param x left bottom point x
+#' @param y left bottom point y
+#' @param w width
+#' @param h height
+#'
+#' @return The Rectangle object
+#' @export
+#'
+#' @examples
+#' create_rectangle(1,1,1,1)
+create_rectangle <- function(x = 0,
+                             y = 0 ,
+                             w = 1,
+                             h = 1) {
+  myPoint <- new(
+    "Rectangle",
+    x = x,
+    y = y,
+    w = w,
+    h = h
+  )
+  return(myPoint)
+}
+
+
 #' Note: for some situations, we need to define a formal point.
 #' Thus, we could thinking like a object.
 #'
@@ -131,6 +188,15 @@ distance <- function(x0, y0, x1, y1) {
   return(sqrt((x1 - x0) ^ 2 + (y1 - y0) ^ 2))
 }
 
+tan_to_sin_cos <- function(tan_value) {
+  hypotenuse <- sqrt(1 + tan_value * tan_value)
+
+  result <-
+    list(sin = tan_value / hypotenuse , cos = 1 / hypotenuse)
+
+  return(result)
+}
+
 #' Get the rotation of the two points.
 #'
 #' @param x1 point1 x
@@ -193,4 +259,54 @@ draw_2xn_matrix_points <- function(... , default.units = 'in'){
   walk(all_objs, function(x){
     grid.lines(x[1,],x[2,],default.units = default.units)
   })
+}
+
+
+#' draw_lineArrow_accordingTo_grobAndPoints
+#'
+#' @param node1 grob 1
+#' @param node2 grob 2
+#' @param x1 x1
+#' @param y1 y1
+#' @param x2 x2
+#' @param y2 y2
+#' @param arrow the arrow instance
+#' @param ... arguments pass to the grid.lines() function
+#'
+#' @export
+#' @importFrom gridGeometry trimGrob
+#'
+#' @examples
+#' node1 <- get_global_bioGraphics_nodes_list()[['ligand']]
+#' node2 <- get_global_bioGraphics_nodes_list()[['receptor']]
+#' ligand$xAxis_or_radius, receptor$xAxis_or_radius
+#' ligand$yAxis_or_angle, receptor$yAxis_or_angle
+#' draw_lineArrow_accordingTo_grobAndPoints(node1,node2,x1,y1,x2,y2)
+draw_lineArrow_accordingTo_grobAndPoints <- function(node1,node2, x1,y1,x2,y2,arrow = NULL,...){
+
+
+  line <- linesGrob(
+    x = c(x1,x2),
+    y = c(y1, y2),
+    default.units = 'in'
+  )
+
+
+  p <- polyclipGrob(line, gList(node1, node2), op="minus",
+                    gp=gpar(lwd=2))
+
+  p <- trimGrob(p,from = 0.1, to = 0.9)
+  # grid.newpage()
+  # grid.draw(node1)
+  # grid.draw(node2)
+  # grid.draw(line)
+  #
+  # grid.draw(p)
+  temp <- grobCoords(p, closed = F)
+  a <- temp[[1]][[1]]
+  if (is.null(arrow)) {
+    arrow <- arrow()
+  }
+  grid.lines(a$x, a$y, arrow = arrow,default.units = 'in',...)
+
 }

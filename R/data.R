@@ -11,3 +11,8 @@
 #' }
 #'
 "lipid_models"
+
+
+#' Create the basic bio graphics node templates
+#' Besides the circle and ellipse shape
+"basic_bioGraphics_templates"

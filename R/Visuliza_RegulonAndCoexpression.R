@@ -1,55 +1,7 @@
-#' @export
-BioGraphicNode <- R6Class(
-  classname = "BioGraphicNode",
-  inherit = GraphicNode,
-  public = list(
-    circle_radius = 50,
-    # may be a ellipse/oval
-    shape_aspect_ratio = 0,
-    draw_me = function(default_unit = 'in',
-                       gp_shape = gpar(),
-                       gp_text = gpar()) {
-      x = self$xAxis_or_radius
-      y = self$yAxis_or_angle
-      r = self$circle_radius
 
 
-      # grid.rect(x -r ,y,width = 2*r,height = 15,just = 0, gp = gpar(fill = 'black'),default.units = default_unit)
-      # grid.circle(x=x,y=y,default.units = default_unit, r = r, gp = gpar(fill = NA))
-
-      xLeft <- x - r
-      xRight <- x + r
-      x <- c(xLeft, xLeft, xRight, xRight, xRight, xLeft)
-      y <- c(y, y + r, y + r, y, y - r, y - r)
-      grid.Bezier(
-        x = x ,
-        y = y,
-        open = F,
-        default.units = default_unit,
-        gp = gp_shape
-      )
-
-      grid.text(
-        x = self$xAxis_or_radius,
-        y = self$yAxis_or_angle,
-        label = self$label,
-        default.units = default_unit,
-        gp = gp_text
-      )
-    }
-  )
-
-)
 
 
-tan_to_sin_cos <- function(tan_value) {
-  hypotenuse <- sqrt(1 + tan_value * tan_value)
-
-  result <-
-    list(sin = tan_value / hypotenuse , cos = 1 / hypotenuse)
-
-  return(result)
-}
 
 
 getBottomXYList_fromBezier <- function(ol, default_unit) {
@@ -81,30 +33,47 @@ getBottomXYList_fromBezier <- function(ol, default_unit) {
 }
 
 getBottomXYList_fromMultipleCurves <-
-  function(ol,coexpresNodes_belongsTo_targets,
+  function(ol,
+           coexpresNodes_belongsTo_targets,
            half_unit_coexpression_node = 0.5,
            default_unit = 'in') {
     x_ploygon <- vector()
     y_ploygon <- vector()
 
     length_of_co <- length(coexpresNodes_belongsTo_targets)
-    xx1 <- map_dbl(rev(coexpresNodes_belongsTo_targets), ~ .x$xAxis_or_radius + half_unit_coexpression_node)
+    xx1 <-
+      map_dbl(
+        rev(coexpresNodes_belongsTo_targets),
+        ~ .x$xAxis_or_radius + half_unit_coexpression_node
+      )
     xx1[1] <- ol$x_coeNodes_rightMost
-    xx2 <- map_dbl(rev(coexpresNodes_belongsTo_targets), ~ .x$xAxis_or_radius - half_unit_coexpression_node)
+    xx2 <-
+      map_dbl(
+        rev(coexpresNodes_belongsTo_targets),
+        ~ .x$xAxis_or_radius - half_unit_coexpression_node
+      )
     xx2[length_of_co] <- ol$x_coeNodes_leftMost
 
 
-    yy1 <- map_dbl(rev(coexpresNodes_belongsTo_targets), ~ .x$yAxis_or_angle - 0.5 * ol$circle_unit_r_value )
+    yy1 <-
+      map_dbl(
+        rev(coexpresNodes_belongsTo_targets),
+        ~ .x$yAxis_or_angle - 0.5 * ol$circle_unit_r_value
+      )
     temp_y <- ol$y_coeNodes_rightMost
     yy1[1] <- temp_y
-    yy2 <- map_dbl(rev(coexpresNodes_belongsTo_targets), ~ .x$yAxis_or_angle - 0.5 * ol$circle_unit_r_value )
+    yy2 <-
+      map_dbl(
+        rev(coexpresNodes_belongsTo_targets),
+        ~ .x$yAxis_or_angle - 0.5 * ol$circle_unit_r_value
+      )
     yy2[length_of_co] <-  temp_y
 
     curvatures <- rep(-0.5, length_of_co)
     curvatures[1] <- -0.7
     curvatures[length_of_co] <- -0.7
 
-    pwalk(list(xx1,xx2,yy1,yy2,curvatures), function(x1,x2,y1,y2,curvature) {
+    pwalk(list(xx1, xx2, yy1, yy2, curvatures), function(x1, x2, y1, y2, curvature) {
       a <- curveGrob(
         x1 = x1,
         y1 = y1,
@@ -132,7 +101,7 @@ getBottomXYList_fromMultipleCurves <-
 
     # grid.lines(x_ploygon,y_ploygon,default.units = default_unit, gp = gpar(col = 'red') )
     # grid.polygon(x_ploygon,y_ploygon,default.units = default_unit, gp = gpar(fill = 'green') )
-    return(list(x = x_ploygon, y =y_ploygon))
+    return(list(x = x_ploygon, y = y_ploygon))
   }
 
 #' Outbound painter
@@ -209,11 +178,13 @@ half_unit_coexpression_node = 0.5) {
   if (buttomStyleBezier) {
     pts <- getBottomXYList_fromBezier(ol, default_unit)
   } else {
-
     pts <-
-      getBottomXYList_fromMultipleCurves(ol,coexpresNodes_belongsTo_targets,
-                                         half_unit_coexpression_node,
-                                         default_unit)
+      getBottomXYList_fromMultipleCurves(
+        ol,
+        coexpresNodes_belongsTo_targets,
+        half_unit_coexpression_node,
+        default_unit
+      )
   }
 
   x_ploygon <- c(x_ploygon, pts$x)
@@ -312,27 +283,39 @@ display_TF_targets_coexpress <- function(data = list(
   TF = "TF1",
   targets = paste0("g", c(4, 1, 9, 8, 3, 2, 6, 7, 5)),
   coexpression = c(paste0("g", 1:7), paste0("k", 1:3))
-), buttomStyleBezier = F) {
-
+),
+buttomStyleBezier = F,
+paintArea = NULL) {
   default_unit = 'in'
   last_index_of_coexpresion_belongTo_targes <-
     length(intersect(data$coexpression, data$targets))
 
-  dim_of_device <- par("din")
-  width <- dim_of_device[1]
-  height <- dim_of_device[2]
 
-  blank_area <-
-    calculate_blankArea( width = width, height = height)
-  available_width <- width - blank_area$l - blank_area$r
-  available_height <- height - blank_area$b - blank_area$t
+
+  if (is.null(paintArea)) {
+    dim_of_device <- par("din")
+    width <- dim_of_device[1]
+    height <- dim_of_device[2]
+
+    blank_area <-
+      calculate_blankArea(width = width, height = height)
+
+    available_width <- width - blank_area$l - blank_area$r
+    available_height <- height - blank_area$b - blank_area$t
+
+    paintArea <- create_rectangle(blank_area$l, blank_area$b, available_width, available_height)
+
+  }else {
+    available_width <- paintArea@w
+    available_height <- paintArea@h
+  }
 
   # generate nodes for coexpression and targets
-  node_TF <- BioGraphicNode$new(1)
+  node_TF <- create_round_node()
   node_TF$label <- data$TF
 
   createNodeFunc <- function(x) {
-    node <- BioGraphicNode$new()
+    node <- create_oval_node(scaleWidth = 1, scaleHeight = 0.7)
     node$label <- x
     return(node)
   }
@@ -350,9 +333,9 @@ display_TF_targets_coexpress <- function(data = list(
   num_coexpression_nodes <- length(data$coexpression)
   num_target_nodes <- length(data$targets)
 
-  yAxis_TF <- 0.9 * height
-  yAxis_coexpression_nodes <- 0.5 * height
-  yAxis_targets <- 0.1 * height
+  yAxis_TF <- 0.9 * available_height +  paintArea@y
+  yAxis_coexpression_nodes <- 0.5 * available_height +  paintArea@y
+  yAxis_targets <- 0.1 * available_height +  paintArea@y
 
   # calculate: 0.5 is for radius,
   # 0.9 is the ratio of paint the circle
@@ -361,16 +344,16 @@ display_TF_targets_coexpress <- function(data = list(
   radius_circule_coeNode = 0.9 * half_unit_coexpression_node
 
   half_unit_target_node <- available_width / num_target_nodes * 0.5
-  radius_circule_tarNode = 0.9 * half_unit_target_node
+  radius_circule_tarNode  = 0.9 * half_unit_target_node
 
 
-  node_TF$xAxis_or_radius <- 0.3 * available_width + blank_area$l
+  node_TF$xAxis_or_radius <- 0.3 * available_width + paintArea@x
   node_TF$yAxis_or_angle <- yAxis_TF
   node_TF$circle_radius <- 0.07 * available_width
 
 
   xs_for_circle <-
-    available_width * seq_along(coexpressionNodes) / num_coexpression_nodes - half_unit_coexpression_node + blank_area$l
+    available_width * seq_along(coexpressionNodes) / num_coexpression_nodes - half_unit_coexpression_node + paintArea@x
   pwalk(list(coexpressionNodes, xs_for_circle), function(x, t) {
     x$xAxis_or_radius <- t
     x$yAxis_or_angle <- yAxis_coexpression_nodes
@@ -378,7 +361,7 @@ display_TF_targets_coexpress <- function(data = list(
   })
 
   xs_for_circle <-
-    available_width * seq_along(targetsNodes) / num_target_nodes - half_unit_target_node + blank_area$l
+    available_width * seq_along(targetsNodes) / num_target_nodes - half_unit_target_node + paintArea@x
   pwalk(list(targetsNodes, xs_for_circle), function(x, t) {
     x$xAxis_or_radius <- t
     x$yAxis_or_angle <- yAxis_targets
@@ -495,18 +478,20 @@ display_TF_targets_coexpress <- function(data = list(
     )
   }
 
+  global_pars <- get_global_pars()
+  my_font_size <- global_pars[['fontsize']];
 
   # draw the coexpression genes
   default_gpar_for_genes <-
     gpar(fill = '#DDDDDD',
          lwd = 1,
-         fontsize = global_pars[['fontsize']])
+         fontsize = my_font_size)
   gpar_for_coexp_butNot_targ <-
     gpar(
       col = '#828282',
       fill = '#DDDDDD',
       lwd = 1,
-      fontsize = global_pars[['fontsize']]
+      fontsize = my_font_size
     )
   # draw the coexpression genes
   draw_coexpressed_genes <- function(x, index) {
@@ -552,8 +537,10 @@ display_TF_targets_coexpress <- function(data = list(
         ,
         default.units = default_unit
       )
+      x$gpar_shape <- default_gpar_for_genes
+      x$gpar_text <- default_gpar_for_genes
 
-      x$draw_me(gp_shape = default_gpar_for_genes, gp_text = default_gpar_for_genes)
+
     } else {
       grid.segments(
         x0 = node_TF$xAxis_or_radius,
@@ -569,18 +556,23 @@ display_TF_targets_coexpress <- function(data = list(
         default.units = default_unit
       )
 
-      x$draw_me(gp_shape = gpar_for_coexp_butNot_targ, gp_text = gpar_for_coexp_butNot_targ)
+      x$gpar_shape <- gpar_for_coexp_butNot_targ
+      x$gpar_text <- gpar_for_coexp_butNot_targ
     }
-
+    x$draw_me()
   }
   pwalk(list(coexpressionNodes, 1:length(coexpressionNodes)), draw_coexpressed_genes)
 
   # TF draw
-  node_TF$draw_me(gp_shape = default_gpar_for_genes, gp_text = default_gpar_for_genes)
+  node_TF$gpar_shape <- default_gpar_for_genes
+  node_TF$gpar_text <- default_gpar_for_genes
+  node_TF$draw_me()
 
   # target nodes
   walk(targetsNodes, function(x) {
-    x$draw_me(gp_shape = default_gpar_for_genes, gp_text = default_gpar_for_genes)
+    x$gpar_shape <- default_gpar_for_genes
+    x$gpar_text <- default_gpar_for_genes
+    x$draw_me()
   })
 
   # grid.newpage()
