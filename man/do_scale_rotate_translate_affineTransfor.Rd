@@ -2,7 +2,8 @@
 % Please edit documentation in R/Class_AffineTransformer.R
 \name{do_scale_rotate_translate_affineTransfor}
 \alias{do_scale_rotate_translate_affineTransfor}
-\title{First scale, next rotate and finally translate.}
+\title{First scale, next rotate and finally translate.
+This is a high-level convenient function.}
 \usage{
 do_scale_rotate_translate_affineTransfor(
   mat,
@@ -31,6 +32,7 @@ the transformed matrix
 }
 \description{
 First scale, next rotate and finally translate.
+This is a high-level convenient function.
 }
 \examples{
 do_scale_rotate_translate_affineTransfor( your requirement)

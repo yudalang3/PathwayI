@@ -4,15 +4,20 @@
 \name{basic_bioGraphics_templates}
 \alias{basic_bioGraphics_templates}
 \title{Create the basic bio graphics node templates
-Besides the circle and ellipse shape}
+Besides the circle, ellipse, rectangle, round rectangle}
 \format{
-An object of class \code{list} of length 2.
+a list in list structure
+usually the template has width and height properties.
+The 'basic_ligand' and 'basic_receptor' are general, so this is the coupled pair.
+}
+\source{
+manually created my developers.
 }
 \usage{
 basic_bioGraphics_templates
 }
 \description{
 Create the basic bio graphics node templates
-Besides the circle and ellipse shape
+Besides the circle, ellipse, rectangle, round rectangle
 }
 \keyword{datasets}

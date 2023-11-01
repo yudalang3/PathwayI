@@ -1,9 +1,3 @@
-
-
-
-
-
-
 getBottomXYList_fromBezier <- function(ol, default_unit) {
   x = c(
     ol$x_coeNodes_leftMost,

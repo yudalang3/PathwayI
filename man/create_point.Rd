@@ -3,7 +3,8 @@
 \name{create_point}
 \alias{create_point}
 \title{Note: for some situations, we need to define a formal point.
-Thus, we could thinking like a object.}
+Thus, we could thinking like a object.
+This is also support the vectorised usage.}
 \usage{
 create_point(x = 0, y = 0)
 }
@@ -18,7 +19,9 @@ the point instance
 \description{
 Note: for some situations, we need to define a formal point.
 Thus, we could thinking like a object.
+This is also support the vectorised usage.
 }
 \examples{
 create_point(1,2)
+create_point(x = 1:10, y = 2:11)
 }

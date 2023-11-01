@@ -4,10 +4,10 @@
 \alias{do_affine_transformation}
 \title{The core process to do the affine transformation.}
 \usage{
-do_affine_transformation(mat, transform_mat)
+do_affine_transformation(input_mat, transform_mat)
 }
 \arguments{
-\item{mat}{the matrix that need to be transformed. The format is defined in the details.}
+\item{input_mat}{the matrix that need to be transformed. The format is defined in the details.}
 
 \item{transform_mat}{the transform matrix, always should be a 3 x 3 diminsion.}
 }
@@ -24,7 +24,7 @@ The input matrix is defined as a 2 * n dimension.
 
 For example, if you have 3 points, you should input a 2 x 3 matrix.
 
-The output matrix is a 3 * n dimension matrix.
+The output matrix is a 2 * n dimension matrix.
 }
 \examples{
 
@@ -42,4 +42,5 @@ grid.newpage()
 grid.lines(x =mat[1,], y = mat[2,], default.units = 'in' )
 after_mat <- do_affine_transformation(mat,transform_mat)
 grid.lines(x =after_mat[1,], y = after_mat[2,], default.units = 'in' )
+
 }

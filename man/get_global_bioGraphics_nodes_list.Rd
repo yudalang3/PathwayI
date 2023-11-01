@@ -2,15 +2,15 @@
 % Please edit documentation in R/Global_variables.R
 \name{get_global_bioGraphics_nodes_list}
 \alias{get_global_bioGraphics_nodes_list}
-\title{get_global_bioGraphics_nodes_list}
+\title{Each bioGraphicsNode instance as well as some properties will be record, so users can get the instance here.}
 \usage{
 get_global_bioGraphics_nodes_list()
 }
 \value{
-a list
+a list of the needed information
 }
 \description{
-get_global_bioGraphics_nodes_list
+The record will increase by the [\code{\link[=register_global_bioGraphics_nodes_list]{register_global_bioGraphics_nodes_list()}}] function.
 }
 \examples{
 get_global_bioGraphics_nodes_list() |> names()

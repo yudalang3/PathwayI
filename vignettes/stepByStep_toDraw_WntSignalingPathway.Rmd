@@ -1,0 +1,298 @@
+---
+title: "stepByStep_toDraw_WntSignalingPathway"
+output: rmarkdown::html_vignette
+number_sections: true
+date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
+vignette: >
+  %\VignetteIndexEntry{stepByStep_toDraw_WntSignalingPathway}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width=7, fig.height=5,
+  fig.align = "center"
+)
+```
+
+
+I frequently use the `grid` and `purrr` package, so besides load the `PathwayIlluminator`, these two packages are needed.
+
+```{r setup}
+library(PathwayIlluminator)
+library(grid)
+library(purrr)
+## new packages need to added
+library(gridBezier)
+```
+
+
+## First, the basic self-contained bio graphics model
+
+The following codes can display the supported models.
+
+```{r}
+basic_bioGraphics_templates |> names()
+```
+
+Draw a FZD protein:
+
+```{r fig.height=3,fig.width=4}
+location_of_fzd <- create_point(1.5,2)
+fzdProt <-
+  create_selfContained_simple_bioGraphicsNode(name = 'FZD_1')
+fzdProt$xAxis_or_radius <- location_of_fzd@x
+fzdProt$yAxis_or_angle <- location_of_fzd@y
+fzdProt$circle_radius <- 1
+fzdProt$gpar_shape <- gpar(fill = 'brown')
+fzdProt$label <- "FZD"
+fzdProt$text_position <- c(0.5,0)
+fzdProt$draw_me()
+```
+
+
+## draw a basic WNT signaling off state pathway
+
+Let us draw a basic off state Wnt pathway.
+
+```{r}
+grid.newpage()
+show_grid_forAssistance()
+clear_global_bioGraphics_nodes_list()
+
+painter <- create_lipidBilayer_drawer(draw_circle_head = F)
+# painter$lipid_head_par <- gpar(fill = 'lightblue', col = 'NA')
+painter$percentage_of_off_track <- 0.1
+painter$desired_hight <- 0.15
+
+coords <- create_round_rectangle_xyCoords(x = 1, y = 0.5, w = 3, h = 3, r = 1, space = 0.1)
+
+
+painter$draw_lipid_along_curve(lineX = coords[1, ],  lineY = coords[2, ] , closedPolygon = T)
+
+
+
+location_of_lrp <- create_point(coords[1,1], coords[2,1])
+lrpProt <-
+  create_selfContained_simple_bioGraphicsNode(name = 'LRP_2')
+lrpProt$xAxis_or_radius <- location_of_lrp@x
+lrpProt$yAxis_or_angle <- location_of_lrp@y
+lrpProt$circle_radius <- 0.15
+lrpProt$gpar_shape <- gpar(fill = 'white')
+lrpProt$label <- "LRP"
+lrpProt$text_position <- c(0.5,0)
+lrpProt$draw_me()
+
+location_of_fzd <- create_point(coords[1,11], coords[2,11])
+fzdProt <-
+  create_selfContained_simple_bioGraphicsNode(name = 'FZD_1')
+fzdProt$xAxis_or_radius <- location_of_fzd@x
+fzdProt$yAxis_or_angle <- location_of_fzd@y
+fzdProt$circle_radius <- 1
+fzdProt$gpar_shape <- gpar(fill = 'brown')
+fzdProt$label <- "FZD"
+fzdProt$text_position <- c(0.5,0)
+fzdProt$draw_me()
+
+
+location_of_axin <- create_point(2, 2.5)
+axinProt <- create_rectangular_node(scaleHeight = 0.5,inner_extension_ratio = 0.15)
+axinProt$xAxis_or_radius <- location_of_axin@x
+axinProt$yAxis_or_angle <- location_of_axin@y
+axinProt$circle_radius <- 0.8
+axinProt$gpar_shape <- gpar(fill = 'green4')
+axinProt$label <- "AXIN"
+axinProt$text_position <- c(0.5,0.5)
+axinProt$draw_me()
+
+location_of_apc <- create_point(1.8, 2.1)
+apcProt <- create_oval_node(scaleHeight = 0.6, inner_extension_ratio = 0.15)
+apcProt$xAxis_or_radius <- location_of_apc@x
+apcProt$yAxis_or_angle <- location_of_apc@y
+apcProt$circle_radius <- 0.4
+apcProt$gpar_shape <- gpar(fill = 'lightblue')
+apcProt$label <- "APC"
+apcProt$text_position <- c(0.5,0.5)
+apcProt$draw_me()
+
+location_of_gsk3b <- create_point(2.5, 2.2)
+gsk3bProt <- create_oval_node(scaleHeight = 0.6, inner_extension_ratio = 0.15)
+gsk3bProt$xAxis_or_radius <- location_of_gsk3b@x
+gsk3bProt$yAxis_or_angle <- location_of_gsk3b@y
+gsk3bProt$circle_radius <- 0.4
+gsk3bProt$gpar_shape <- gpar(fill = 'orange4')
+gsk3bProt$label <- "GSK3B"
+gsk3bProt$text_position <- c(0.5,0.5)
+gsk3bProt$draw_me()
+
+location_of_ck1a <- create_point(2.2, 1.8)
+ck1aProt <- create_oval_node(scaleHeight = 0.5, inner_extension_ratio = 0.15)
+ck1aProt$xAxis_or_radius <- location_of_ck1a@x
+ck1aProt$yAxis_or_angle <- location_of_ck1a@y
+ck1aProt$circle_radius <- 0.4
+ck1aProt$gpar_shape <- gpar(fill = 'pink1')
+ck1aProt$label <- "CK1A"
+ck1aProt$text_position <- c(0.5,0.5)
+ck1aProt$draw_me()
+
+
+bCatProt <-
+  create_selfContained_simple_bioGraphicsNode(name = 'bCatenin')
+bCatProt$xAxis_or_radius <- 2.5
+bCatProt$yAxis_or_angle <- 1
+bCatProt$circle_radius <- 1
+bCatProt$gpar_shape <- gpar(fill = 'white')
+bCatProt$label <- "B-CATENIN"
+bCatProt$text_position <- c(0.5,0.5)
+bCatProt$gpar_shape <- gpar(fill = 'purple1')
+bCatProt$draw_me()
+
+bCatProt2 <-
+  create_selfContained_simple_bioGraphicsNode(name = 'bCatenin')
+bCatProt2$xAxis_or_radius <- 3.3
+bCatProt2$yAxis_or_angle <- 1.5
+bCatProt2$circle_radius <- 1
+bCatProt2$rotation_angle_inRadian <- 30 * ONE_DEGREE_IN_RADIAN
+bCatProt2$gpar_shape <- gpar(fill = 'grey90')
+bCatProt2$label <- "B-CAT-Phos"
+bCatProt2$text_position <- c(0.5,0.5)
+bCatProt2$draw_me()
+
+nodeList <- get_global_bioGraphics_nodes_list()
+nodeList |> names()
+
+node1 <- nodeList[['B-CATENIN']]
+node2 <- nodeList[['B-CAT-Phos']]
+node1_grob <- node1$grob
+node2_grob <- node2$grob
+x1 <- node1$x;x2 <-  node2$x
+y1 <- node1$y;y2 <-  node2$y
+
+arrow <- arrow(type = 'closed', length = unit(0.1, 'in'))
+draw_lineArrow_accordingTo_grobAndPoints(node1_grob,node2_grob,x1,y1,x2,y2,arrow = arrow)
+
+```
+
+
+Remove the assistant grid lines are the desired figure.
+
+
+```{r echo=FALSE}
+grid.newpage()
+clear_global_bioGraphics_nodes_list()
+
+painter <- create_lipidBilayer_drawer(draw_circle_head = F)
+# painter$lipid_head_par <- gpar(fill = 'lightblue', col = 'NA')
+painter$percentage_of_off_track <- 0.1
+painter$desired_hight <- 0.15
+
+coords <- create_round_rectangle_xyCoords(x = 1, y = 0.5, w = 3, h = 3, r = 1, space = 0.1)
+
+
+painter$draw_lipid_along_curve(lineX = coords[1, ],  lineY = coords[2, ] , closedPolygon = T)
+
+
+
+location_of_lrp <- create_point(coords[1,1], coords[2,1])
+lrpProt <-
+  create_selfContained_simple_bioGraphicsNode(name = 'LRP_2')
+lrpProt$xAxis_or_radius <- location_of_lrp@x
+lrpProt$yAxis_or_angle <- location_of_lrp@y
+lrpProt$circle_radius <- 0.15
+lrpProt$gpar_shape <- gpar(fill = 'white')
+lrpProt$label <- "LRP"
+lrpProt$text_position <- c(0.5,0)
+lrpProt$draw_me()
+
+location_of_fzd <- create_point(coords[1,11], coords[2,11])
+fzdProt <-
+  create_selfContained_simple_bioGraphicsNode(name = 'FZD_1')
+fzdProt$xAxis_or_radius <- location_of_fzd@x
+fzdProt$yAxis_or_angle <- location_of_fzd@y
+fzdProt$circle_radius <- 1
+fzdProt$gpar_shape <- gpar(fill = 'brown')
+fzdProt$label <- "FZD"
+fzdProt$text_position <- c(0.5,0)
+fzdProt$draw_me()
+
+
+location_of_axin <- create_point(2, 2.5)
+axinProt <- create_rectangular_node(scaleHeight = 0.5,inner_extension_ratio = 0.15)
+axinProt$xAxis_or_radius <- location_of_axin@x
+axinProt$yAxis_or_angle <- location_of_axin@y
+axinProt$circle_radius <- 0.8
+axinProt$gpar_shape <- gpar(fill = 'green4')
+axinProt$label <- "AXIN"
+axinProt$text_position <- c(0.5,0.5)
+axinProt$draw_me()
+
+location_of_apc <- create_point(1.8, 2.1)
+apcProt <- create_oval_node(scaleHeight = 0.6, inner_extension_ratio = 0.15)
+apcProt$xAxis_or_radius <- location_of_apc@x
+apcProt$yAxis_or_angle <- location_of_apc@y
+apcProt$circle_radius <- 0.4
+apcProt$gpar_shape <- gpar(fill = 'lightblue')
+apcProt$label <- "APC"
+apcProt$text_position <- c(0.5,0.5)
+apcProt$draw_me()
+
+location_of_gsk3b <- create_point(2.5, 2.2)
+gsk3bProt <- create_oval_node(scaleHeight = 0.6, inner_extension_ratio = 0.15)
+gsk3bProt$xAxis_or_radius <- location_of_gsk3b@x
+gsk3bProt$yAxis_or_angle <- location_of_gsk3b@y
+gsk3bProt$circle_radius <- 0.4
+gsk3bProt$gpar_shape <- gpar(fill = 'orange4')
+gsk3bProt$label <- "GSK3B"
+gsk3bProt$text_position <- c(0.5,0.5)
+gsk3bProt$draw_me()
+
+location_of_ck1a <- create_point(2.2, 1.8)
+ck1aProt <- create_oval_node(scaleHeight = 0.5, inner_extension_ratio = 0.15)
+ck1aProt$xAxis_or_radius <- location_of_ck1a@x
+ck1aProt$yAxis_or_angle <- location_of_ck1a@y
+ck1aProt$circle_radius <- 0.4
+ck1aProt$gpar_shape <- gpar(fill = 'pink1')
+ck1aProt$label <- "CK1A"
+ck1aProt$text_position <- c(0.5,0.5)
+ck1aProt$draw_me()
+
+
+bCatProt <-
+  create_selfContained_simple_bioGraphicsNode(name = 'bCatenin')
+bCatProt$xAxis_or_radius <- 2.5
+bCatProt$yAxis_or_angle <- 1
+bCatProt$circle_radius <- 1
+bCatProt$gpar_shape <- gpar(fill = 'white')
+bCatProt$label <- "B-CATENIN"
+bCatProt$text_position <- c(0.5,0.5)
+bCatProt$gpar_shape <- gpar(fill = 'purple1')
+bCatProt$draw_me()
+
+bCatProt2 <-
+  create_selfContained_simple_bioGraphicsNode(name = 'bCatenin')
+bCatProt2$xAxis_or_radius <- 3.3
+bCatProt2$yAxis_or_angle <- 1.5
+bCatProt2$circle_radius <- 1
+bCatProt2$rotation_angle_inRadian <- 30 * ONE_DEGREE_IN_RADIAN
+bCatProt2$gpar_shape <- gpar(fill = 'grey90')
+bCatProt2$label <- "B-CAT-Phos"
+bCatProt2$text_position <- c(0.5,0.5)
+bCatProt2$draw_me()
+
+nodeList <- get_global_bioGraphics_nodes_list()
+nodeList |> names()
+
+node1 <- nodeList[['B-CATENIN']]
+node2 <- nodeList[['B-CAT-Phos']]
+node1_grob <- node1$grob
+node2_grob <- node2$grob
+x1 <- node1$x;x2 <-  node2$x
+y1 <- node1$y;y2 <-  node2$y
+
+arrow <- arrow(type = 'closed', length = unit(0.1, 'in'))
+draw_lineArrow_accordingTo_grobAndPoints(node1_grob,node2_grob,x1,y1,x2,y2,arrow = arrow)
+
+```

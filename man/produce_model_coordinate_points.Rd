@@ -21,7 +21,7 @@ produce_model_coordinate_points(
 
 \item{break_points}{the angles points in degree}
 
-\item{radius}{the radius of circle}
+\item{radius}{the radius of circle regardless of the coordinates.}
 }
 \value{
 matrix, see details
@@ -30,13 +30,21 @@ matrix, see details
 It has many applications:
 \enumerate{
 \item produce poly regular shapes: like triangles, rectangular and so on.
-\item just drow a circle, with points.
+\item just drawing a circle, with points.
 }
 }
 \details{
 The return values formats are:
 a 2 x n matrix, first row is x axis, second row is y axis.
+
+The 0 angle is 0 o'clock in the clock, angle of 90 is the 3 o'clock, angle of 180 is the 6 o'clock.
 }
 \examples{
-produce_model_coordinate_points()
+a <- produce_model_coordinate_points(from = 0,to = 160,by = 30,radius = 1)
+xCenter <- 3; yCenter <- 3
+xLocations <- a[1, ] + xCenter;
+yLocations <- a[2, ] + yCenter;
+
+grid.newpage()
+grid.lines(x = xLocations, y = yLocations, default.units = 'in')
 }

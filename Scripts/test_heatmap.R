@@ -1,3 +1,5 @@
+# to learn the color mapper, this is also a very very basic fundemental functions.
+# When we use the color mapper, it will be needed to mapping the color
 
 # Rectangular heatmap -----------------------------------------------------
 ret <- process_createNodes(2,numOfChildren = 3)

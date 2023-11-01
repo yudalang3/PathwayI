@@ -13,5 +13,5 @@ the global pars
 Get global parameters.
 }
 \examples{
-get_global_pars()
+get_global_pars() |> names()
 }

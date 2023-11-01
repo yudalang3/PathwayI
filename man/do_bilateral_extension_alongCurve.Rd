@@ -4,7 +4,7 @@
 \alias{do_bilateral_extension_alongCurve}
 \title{Employ the bilateral extansion along a curve}
 \usage{
-do_bilateral_extension_alongCurve(x, y, d = 1)
+do_bilateral_extension_alongCurve(x, y, d = 1, closedPolygon = F)
 }
 \arguments{
 \item{x}{x axis of curve}
@@ -12,6 +12,8 @@ do_bilateral_extension_alongCurve(x, y, d = 1)
 \item{y}{y axis of curve}
 
 \item{d}{Euclidean distance}
+
+\item{closedPolygon}{whether this is a closed polygon}
 }
 \value{
 a list of two line points

@@ -2,12 +2,12 @@
 % Please edit documentation in R/Global_variables.R
 \name{clear_global_bioGraphics_nodes_list}
 \alias{clear_global_bioGraphics_nodes_list}
-\title{clear_global_bioGraphics_nodes_list}
+\title{clear the records to release the memory}
 \usage{
 clear_global_bioGraphics_nodes_list()
 }
 \description{
-clear_global_bioGraphics_nodes_list
+clear the records to release the memory
 }
 \examples{
 clear_global_bioGraphics_nodes_list()

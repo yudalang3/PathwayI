@@ -1,13 +1,10 @@
-
-
 TRANSFORM_MAT_TEMPELATE <-
   matrix(c(1, 0, 0, 0, 1, 0, 0, 0, 1), byrow = T, ncol = 3)
 
 
-
 #' The core process to do the affine transformation.
 #'
-#' @param mat the matrix that need to be transformed. The format is defined in the details.
+#' @param input_mat the matrix that need to be transformed. The format is defined in the details.
 #' @param transform_mat the transform matrix, always should be a 3 x 3 diminsion.
 #' @description
 #'
@@ -20,7 +17,7 @@ TRANSFORM_MAT_TEMPELATE <-
 #'
 #' For example, if you have 3 points, you should input a 2 x 3 matrix.
 #'
-#' The output matrix is a 3 * n dimension matrix.
+#' The output matrix is a 2 * n dimension matrix.
 #'
 #'
 #' @return the transformed matrix. the row number is 2, not three.
@@ -43,12 +40,14 @@ TRANSFORM_MAT_TEMPELATE <-
 #' grid.lines(x =mat[1,], y = mat[2,], default.units = 'in' )
 #' after_mat <- do_affine_transformation(mat,transform_mat)
 #' grid.lines(x =after_mat[1,], y = after_mat[2,], default.units = 'in' )
-do_affine_transformation <- function(mat, transform_mat) {
-  ret <- transform_mat %*% rbind(mat, 1)
+#'
+do_affine_transformation <- function(input_mat, transform_mat) {
+  ret <- transform_mat %*% rbind(input_mat, 1)
   return(ret[1:2, ])
 }
 
 #' First scale, next rotate and finally translate.
+#' This is a high-level convenient function.
 #'
 #' @param mat the input matrix
 #' @param theta angle in radian
@@ -67,7 +66,7 @@ do_scale_rotate_translate_affineTransfor <-
     ret <-
       get_translate_transform_mat(moveX, moveY) %*% get_rotate_transform_mat(theta) %*% get_scale_transform_mat(scaleWidth, scaleHeight)
 
-    ret <- do_affine_transformation(mat = mat,transform_mat = ret)
+    ret <- do_affine_transformation(input_mat = mat,transform_mat = ret)
     return(ret)
   }
 
@@ -245,83 +244,36 @@ do_reflection_yAxis <- function(mat) {
 
 
 
-
-#' Simulate the lipid bilayer model.
-#'
-#' @return a list
-#' ##@###export
-#'
-#' @examples
-#' simulate_lipid_bilayer_model()
-simulate_lipid_bilayer_model <- function(yAxisReflected = F) {
-  from_angle <- -160
-  circle_points <-
-    produce_model_coordinate_points(
-      from = from_angle,
-      by = 1,
-      to = from_angle + 360,
-      radius = 0.3
-    )
-  x_horizontal_distance <- 0.1
-  y_vertical_distance <- 0.4
-
-  first_point <- circle_points[, 1]
-  middle_point <-
-    first_point + c(-x_horizontal_distance, -y_vertical_distance)
-
-  last_point <- first_point
-  last_point[2] <- middle_point[2] - y_vertical_distance
-
-  left_line <- cbind(first_point, middle_point, last_point)
-  right_line <- left_line
-  right_line[1, ] <- right_line[1, ] + 2 * abs(first_point[1])
-
-  # Adjust for the center
-  xAdjust <- 0
-  yAdjust <- abs(last_point[2]) * 1.01
-  left_line[2,] <- left_line[2,] + yAdjust
-  right_line[2,] <- right_line[2,] + yAdjust
-  circle_points[2,] <- circle_points[2,] + yAdjust
-
-
-  if (yAxisReflected) {
-    left_line = do_reflection_xAxis(left_line)
-    right_line = do_reflection_xAxis(right_line)
-    circle_points = do_reflection_xAxis(circle_points)
-  }
-
-  ret <-
-    list(
-      left_line = left_line,
-      right_line = right_line,
-      circle_points = circle_points,
-      head_diameter = 0.6
-    )
-  return(ret)
-}
-
 #' Produce the model circle points.
 #'
 #' @description
 #' It has many applications:
 #' 1. produce poly regular shapes: like triangles, rectangular and so on.
-#' 2. just drow a circle, with points.
+#' 2. just drawing a circle, with points.
 #'
 #' @param from : from angle in degree
 #' @param by : by angle in degree
 #' @param to : to angle in degree
 #' @param break_points the angles points in degree
-#' @param radius the radius of circle
+#' @param radius the radius of circle regardless of the coordinates.
 #'
 #' @details
 #' The return values formats are:
 #' a 2 x n matrix, first row is x axis, second row is y axis.
 #'
+#' The 0 angle is 0 o'clock in the clock, angle of 90 is the 3 o'clock, angle of 180 is the 6 o'clock.
+#'
 #' @return matrix, see details
 #' @export
 #'
 #' @examples
-#' produce_model_coordinate_points()
+#' a <- produce_model_coordinate_points(from = 0,to = 160,by = 30,radius = 1)
+#' xCenter <- 3; yCenter <- 3
+#' xLocations <- a[1, ] + xCenter;
+#' yLocations <- a[2, ] + yCenter;
+#'
+#' grid.newpage()
+#' grid.lines(x = xLocations, y = yLocations, default.units = 'in')
 produce_model_coordinate_points <-
   function(from = 0,
            by = 5,

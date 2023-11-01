@@ -1,20 +1,92 @@
+#' The BioGraphicNode model drawer
+#' @description
+#' `BioGraphicNode` is an models for user to draw any arbitrary node
+#'
+#' It can be organized by list in list structure. Some situations are the most suitable:
+#' * The complex Membrane receptor protein.
+#' * Some complex structure, like DC complex in WNT signaling pathway.
+#'
 #' @export
 BioGraphicNode <- R6Class(
   classname = "BioGraphicNode",
   inherit = GraphicNode,
   public = list(
+    #' @field circle_radius how big the node is.
     circle_radius = 50,
-
+    #' @field rotation_angle_inRadian the rotation angle in radian, default is 0.
+    rotation_angle_inRadian = 0,
+    #' @field xyPoints_shape the x y points  of the drawing shape, default is a rectangle
     xyPoints_shape = rbind(c(-0.5, 0.5, 0.5, -0.5), c(-0.5, -0.5, 0.5, 0.5)),
+    #' @field gpar_shape the gpar for the shape
     gpar_shape = gpar(),
+    #' @field gpar_text the gpar for the text
     gpar_text = gpar(),
+    #' @field inner_extension_ratio the ratio of inner boarder, try this parameter by yourself.
     inner_extension_ratio = 0.15,
+    #' @field text_position hjust and vjust for textGrob
+    text_position = c(0.5, 0.5),
 
-    draw_me = function(default_unit = 'in') {
+    #' Draw if this node does not have children.
+    #' @param default_unit the unit default is inch.
+    draw_if_hasChildren = function(default_unit = 'in') {
       x = self$xAxis_or_radius
       y = self$yAxis_or_angle
       r = self$circle_radius
 
+      ## The 1 means the default free shape is 1 'inch'
+      scaler <- r / 1
+
+      rangeList <- map(self$children, function(child) {
+        xyPoints <-
+          do_scale_rotate_translate_affineTransfor(
+            child$xyPoints_shape,
+            scaleWidth = scaler,
+            scaleHeight = scaler,
+            theta = self$rotation_angle_inRadian,
+            moveX = x,
+            moveY = y
+          )
+        polyGrob <- grid.polygon(
+          x = xyPoints[1, ],
+          y = xyPoints[2, ],
+          default.units = default_unit,
+          gp = child$gpar_shape
+        )
+
+        x_range <- range(xyPoints[1, ])
+        y_range <- range(xyPoints[2, ])
+        return(c(x_range, y_range))
+      })
+
+      df_range <- do.call(rbind, rangeList)
+      xMin <- min(df_range[, 1])
+      yMin <- min(df_range[, 3])
+      xMax <- max(df_range[, 2])
+      yMax <- max(df_range[, 4])
+
+      x <-
+        xMin * (1 - self$text_position[1]) + xMax * self$text_position[1]
+      y <-
+        yMin * (1 - self$text_position[2]) + yMax * self$text_position[2]
+      grid.text(
+        x = x,
+        y = y,
+        label = self$label,
+        default.units = default_unit,
+        gp = self$gpar_text,
+        hjust = 1 - self$text_position[1],
+        vjust = 1 - self$text_position[2]
+      )
+    },
+
+    #' Draw if this node does have children.
+    #' @param default_unit the unit default is inch.
+    draw_if_noChildren = function(default_unit = 'in') {
+      x = self$xAxis_or_radius
+      y = self$yAxis_or_angle
+      r = self$circle_radius
+
+      ## The 1 means the default free shape is 1 'inch'
       scaler <- r / 1
 
       xyPoints <-
@@ -22,16 +94,19 @@ BioGraphicNode <- R6Class(
           self$xyPoints_shape,
           scaleWidth = scaler,
           scaleHeight = scaler,
-          theta = 0,
+          theta = self$rotation_angle_inRadian,
           moveX = x,
           moveY = y
         )
       polyGrob <- grid.polygon(
-        x = xyPoints[1,],
-        y = xyPoints[2,],
+        x = xyPoints[1, ],
+        y = xyPoints[2, ],
         default.units = default_unit,
         gp = self$gpar_shape
       )
+
+      x_range <- range(xyPoints[1, ])
+      y_range <- range(xyPoints[2, ])
 
       register_global_bioGraphics_nodes_list(self$label, list(grob = polyGrob, x =
                                                                 x, y = y))
@@ -47,17 +122,53 @@ BioGraphicNode <- R6Class(
             moveX = x,
             moveY = y
           )
-        grid.polygon(x = xyPoints[1,],
-                     y = xyPoints[2,],
+        grid.polygon(x = xyPoints[1, ],
+                     y = xyPoints[2, ],
                      default.units = default_unit)
       }
-      grid.text(
-        x = x,
-        y = y,
-        label = self$label,
-        default.units = default_unit,
-        gp = self$gpar_text
-      )
+
+      if (!is.na(self$label)) {
+        x <-
+          x_range[1] * (1 - self$text_position[1]) + x_range[2] * self$text_position[1]
+        y <-
+          y_range[1] * (1 - self$text_position[2]) + y_range[2] * self$text_position[2]
+        grid.text(
+          x = x,
+          y = y,
+          label = self$label,
+          default.units = default_unit,
+          gp = self$gpar_text,
+          hjust = 1 - self$text_position[1],
+          vjust = 1 - self$text_position[2],
+          rot = - self$rotation_angle_inRadian / ONE_DEGREE_IN_RADIAN
+        )
+      }
+    },
+
+    #' Draw myself
+    #'
+    #' @param default_unit the coordinate unit, default is 'in'
+    #'
+    #' @export
+    #'
+    #' @examples
+    #' draw_me()
+    draw_me = function(default_unit = 'in') {
+      num_of_children <- self$children |> length()
+      if (num_of_children == 0) {
+        self$draw_if_noChildren(default_unit = default_unit)
+      } else {
+        self$draw_if_hasChildren(default_unit = default_unit)
+      }
+    },
+
+    #' The print method
+    #' Override here
+    print = function() {
+      super$print()
+
+      cat('\n')
+      cat("The dim of the shape is: " , dim(self$xyPoints_shape) , '\n')
     }
 
   )
@@ -168,3 +279,36 @@ create_freeShape_node <-
     a$inner_extension_ratio <- inner_extension_ratio
     return(a)
   }
+
+#' Create the object with the self contained simple bio graphics node.
+#' This node is only has one shape x y coordinates.
+#'
+#'@description
+#' use `basic_bioGraphics_templates |> names()` to see the supported name.
+#'
+#' @param name the name of the supported free shape.
+#'
+#' @return A BioGraphicNode instance.
+#' @export
+#'
+#' @examples
+#' create_selfContained_simple_bioGraphicsNode('LRP_1')
+create_selfContained_simple_bioGraphicsNode <- function(name) {
+  points <- basic_bioGraphics_templates[[name]]$points
+
+  if (is.list(points)) {
+    children <- lapply(points, function(x) {
+      create_freeShape_node(xyPoints_shape = x)
+    })
+
+    parent <- create_rectangular_node()
+    for (node in children) {
+      parent$addChild(node)
+    }
+    ret <- parent
+  } else {
+    ret <- create_freeShape_node(xyPoints_shape = points)
+  }
+
+  return(ret)
+}

@@ -12,26 +12,37 @@
 ############################################### statment
 
 # Define the toppest and the most generic tree node -------------------------------------------------
-# Construct the List Tree Node, we not use the Ring Tree Node as suggested by the Joseph Felsenstein in the <Phylogenetics> book
+#' The Tree Node implementation.
+#'
+#' @details
+#' Construct the List Tree Node, we not use the Ring Tree Node as suggested by the Joseph Felsenstein in the <Phylogenetics> book
+#' @description
+#' `ListTreeNode` is an top level/ most generic node structure.
 ListTreeNode <- R6Class(
   classname = "ListTreeNode",
   public = list(
-    # an static id, used to construct the CGBID: see https://doi.org/10.1093/bib/bbab583
+    #' @field id an static id, used to construct the CGBID: see https://doi.org/10.1093/bib/bbab583
     id = 1,
-    # the branch length of the node
+    #' @field branchLength the branch length of the node
     branchLength = 1,
-    # label, usually for the leaf, a.k.a the leaf name
+    #' @field label usually for the leaf, a.k.a the leaf name
     label = NA_character_,
-    # the number of leaves that are descendants of the current node
+    #' @field members the number of leaves that are descendants of the current node
     members = 1,
-    # the child nodes
-    # We use the
+    #' @field children the children list
     children = list(),
-    # Construct function
+
+    #' Construct function
+    #'
+    #' @param id the numeric id
+    #' @return A new `ListTreeNode` object.
     initialize = function(id = 1) {
       self$id <- id
     },
-    # add a Child for the node
+
+    #' add a Child for the node
+    #'
+    #' @param child the child node
     addChild = function(child) {
       len <- length(self$children)
 
@@ -48,22 +59,35 @@ ListTreeNode <- R6Class(
 
     },
 
-    # return is this a leaf.
+    #' Return whether this a leaf
+    #'
+    #' @return T for leaf, F for internal node
     isLeaf = function() {
       return(length(self$children) == 0)
     },
 
+    #' Print the node information
+    #' @details
+    #' See the information of the node
+    #'
     print = function() {
-      cat("ID: ",
-          self$id,
-          "\tnum of children are: ",
-          length(self$children),
-          "\tlabel: ", self$label,
-          "\tmembers: ", self$members,
-          "\n")
+      cat(
+        "ID: ",
+        self$id,
+        "\tnum of children are: ",
+        length(self$children),
+        "\tlabel: ",
+        self$label,
+        "\tmembers: ",
+        self$members,
+        "\n"
+      )
     },
 
-    # get the CGB ID that can uniquely represent the node.
+    #' get the CGB ID that can uniquely represent the node.
+    #'
+    #' @return the ID name
+    #'
     getIDName =  function() {
       if (self$isLeaf()) {
         return(paste("ID ", self$id))
@@ -77,52 +101,109 @@ ListTreeNode <- R6Class(
 
 
 # Define the Graphic node inherit from the generic node --------------------------------------------
+#' The graphic node for compulating the location and visulization.
+#' @details
+#' It add two novel properties, xAxis_or_radius and yAxis_or_angle.
+#'
 #' @export
 GraphicNode <- R6Class(
   classname = "GraphicNode",
   inherit = ListTreeNode,
-  # Why this property is could xAxis_or_radius,
-  # Because In circular layout the xAxis become the radius, so as for the spiral shape.
-  public = list(xAxis_or_radius = 0,
-                yAxis_or_angle = 0)
+  public = list(## This is the annotation
+    #' @field xAxis_or_radius In circular layout the xAxis become the radius, so as for the spiral shape
+    xAxis_or_radius = 0,
+    #' @field yAxis_or_angle In circular layout the yAxis become the angle, so as for the spiral shape
+    yAxis_or_angle = 0)
 
 )
 
-# Define the Data structure for the GraphicTree --------------------------------------------
-# It most has a rootNode
-# the longestDepth and numOfLeaves is employed for the layout computation
+#' Create the GraphicTree container for the rootNode.
+#' It will also assign the number of nodes (member property of the node) for each node.
+#' @description
+#' You may confused that the Tree container is redundant, for we could represent the tree just using the root node.
+#' While some situations, we need the tree object to record the tree-level
+#'
+#' @param rootNode the root node of the tree
+#'
+#' @return the tree object instance
 #' @export
-GraphicTree <- R6Class(classname = "GraphicTree", public = list(
-  # following are general properties
-  rootNode = NA,
-  longestDepth = 0,
-  numOfLeaves = 0,
-  isPropertiesAssigned = F,
-  # following properties are for circular layout
-  startDegree = 0,
-  extendDegree = 360,
-  innerRadius = 0.1,
-  outterRadius = - 1,
-  direction = 0,
-  xCenter = 0.5,
-  yCenter = 0.5,
+#'
+#' @examples
+#' create_treeObj(rootNode)
+create_treeObj <- function(rootNode) {
+  tree <- GraphicTree$new(rootNode)
+  tree$assignAttributes()
+  return(tree)
+}
 
-  initialize = function(rootNode) {
-    self$rootNode <- rootNode;
-  },
-  assignAttributes = function(){
-    self$longestDepth = getLongestDepth(self$rootNode);
+# Define the Data structure for the GraphicTree --------------------------------------------
+###########################################################################################
 
-    if (self$rootNode$members <= 1) {
-      assignTheCGBID(self$rootNode)
+
+#' The `graphicTree` class to represent the tree.
+#'
+#' @details
+#' <pre>
+#' * It most has a rootNode
+#' * The longestDepth and numOfLeaves is employed for the layout computation
+#' </pre>
+#' @export
+#'
+GraphicTree <- R6Class(
+  classname = "GraphicTree",
+  public = list(
+    #' @field rootNode The root node of the tree.
+    rootNode = NA,
+    #' @field longestDepth The longest depth from the leaf to the root node.
+    longestDepth = 0,
+    #' @field numOfLeaves The total number of leaf in the tree.
+    numOfLeaves = 0,
+    #' @field isPropertiesAssigned Whether the tree instance properties are assigned.
+    isPropertiesAssigned = F,
+    ### following properties are for circular layout
+    #' @field startDegree start degree of the circle
+    startDegree = 0,
+    #' @field extendDegree extend degree of the circle
+    extendDegree = 360,
+    #' @field innerRadius inner radius of the circle
+    innerRadius = 0.1,
+    #' @field outterRadius outter radius of the circle
+    outterRadius = -1,
+    #' @field direction the direction of the circle
+    direction = 0,
+    #' @field xCenter the xCenter of the circle
+    xCenter = 0.5,
+    #' @field yCenter the yCenter of the circle
+    yCenter = 0.5,
+
+    #' Initialize the instance by input the rootNode.
+    #'
+    #' @param rootNode root of the tree
+    initialize = function(rootNode) {
+      self$rootNode <- rootNode
+
+    },
+
+    #' To assign the `numOfLeaves` and `longestDepth` properties.
+    #' @examples
+    #' instance$assignAttributes()
+    assignAttributes = function() {
+      self$longestDepth = getLongestDepth(self$rootNode)
+
+
+      if (self$rootNode$members <= 1) {
+        assignTheCGBID(self$rootNode)
+      }
+
+      self$numOfLeaves = self$rootNode$members
     }
 
-    self$numOfLeaves = self$rootNode$members
-  }
+  )
+)
 
-))
 
-# Following are some convenient methos for the tree and node-------------------------------------
+
+# Following are some convenient methods for the tree and node-------------------------------------
 
 #' Display the tree by the simplest approach, that is , a table-like statement.
 #'
@@ -173,7 +254,8 @@ displayTheTree <- function(node, fun = NULL) {
     }
   }
 
-  invisible();
+  invisible()
+
 }
 
 # A traversal template
@@ -206,7 +288,8 @@ traversal <- function(node) {
 #' }
 #' preOrder_traversal(rootNode, printSomeThing)
 preOrder_traversal <- function(node, fun) {
-  fun(node);
+  fun(node)
+
 
   if (node$isLeaf()) {
 
@@ -233,7 +316,8 @@ preOrder_traversal <- function(node, fun) {
 #' @examples
 #'
 #' process_createNodes(depth = 2, numOfChildren = 3)
-process_createNodes <- function(depth = 1, numOfChildren = 2) {
+process_createNodes <- function(depth = 1,
+                                numOfChildren = 2) {
   root <- GraphicNode$new()
 
 
@@ -265,7 +349,8 @@ process_createNodes <- function(depth = 1, numOfChildren = 2) {
 
   assignTheCGBID(root)
 
-  root$branchLength <- 0;
+  root$branchLength <- 0
+
   storage_env$rootNode <- root
   storage_env$longestDepth <- getLongestDepth(root)
   return(storage_env)
@@ -323,12 +408,14 @@ getLongestDepth <- function(node) {
 #' assignTheCGBID(rootNode)
 assignTheCGBID <- function(node) {
   if (node$isLeaf()) {
-    node$members <- 1;
+    node$members <- 1
+
   } else {
     # 先声明两个最大值和最小值
     firstMinValue <- 999998
     secondMinValue <- 999999
-    sum <- 0;
+    sum <- 0
+
     for (child in node$children) {
       #注意需要添加上min字符
       value <- assignTheCGBID(child)
@@ -338,10 +425,12 @@ assignTheCGBID <- function(node) {
       } else if (value < secondMinValue) {
         secondMinValue <- value
       }
-      sum <- child$members + sum;
+      sum <- child$members + sum
+
     }
     node$id <- c(firstMinValue, secondMinValue)
-    node$members <- sum;
+    node$members <- sum
+
   }
   invisible(min(node$id))
 }
@@ -400,46 +489,59 @@ assignTheCGBID <- function(node) {
 #' dendrogram <- as.dendrogram(hc)
 #' intuitiveTree <- process_dendrogram2intuitiveTree(dendrogram)
 #' displayTheTree(intuitiveTree$rootNode)
-process_dendrogram2intuitiveTree <- function(dendrogram){
-  leaf_id_index <- 1;
-
-  root_height <- attr(x = dendrogram, which = 'height');
-
-  convert_dendrogram2intuitiveTree <- function(node, parent_height = 0) {
-    # cat("Node: ",
-    #     attr(x = node, which = 'members') ,
-    #     "\t" ,
-    #     attr(x = node, which = 'height'),
-    #     "\n")
-
-    height_currentNode <- attr(x = node, which = 'height');
-    branchLength_currentNode <- parent_height - height_currentNode;
+process_dendrogram2intuitiveTree <- function(dendrogram) {
+  leaf_id_index <- 1
 
 
-    new_node <- GraphicNode$new(leaf_id_index);
-    new_node$branchLength <- branchLength_currentNode;
+  root_height <- attr(x = dendrogram, which = 'height')
 
-    if (is.leaf(node)) {
-      leaf_id_index <<- leaf_id_index + 1;
-      new_node$label <- attr(x = node, which = 'label')
-    }else {
-      for (child in node) {
-        new_child <- convert_dendrogram2intuitiveTree( child, height_currentNode)
-        new_node$addChild(new_child);
+
+  convert_dendrogram2intuitiveTree <-
+    function(node, parent_height = 0) {
+      # cat("Node: ",
+      #     attr(x = node, which = 'members') ,
+      #     "\t" ,
+      #     attr(x = node, which = 'height'),
+      #     "\n")
+
+      height_currentNode <- attr(x = node, which = 'height')
+
+      branchLength_currentNode <- parent_height - height_currentNode
+
+
+
+      new_node <- GraphicNode$new(leaf_id_index)
+
+      new_node$branchLength <- branchLength_currentNode
+
+
+      if (is.leaf(node)) {
+        leaf_id_index <<- leaf_id_index + 1
+
+        new_node$label <- attr(x = node, which = 'label')
+      } else {
+        for (child in node) {
+          new_child <-
+            convert_dendrogram2intuitiveTree(child, height_currentNode)
+          new_node$addChild(new_child)
+
+        }
       }
+
+      return(new_node)
+
     }
 
-    return(new_node);
-  }
+  root <- convert_dendrogram2intuitiveTree(dendrogram, root_height)
 
-  root <- convert_dendrogram2intuitiveTree(dendrogram, root_height);
   assignTheCGBID(root)
 
   tree = GraphicTree$new(root)
   # don not forget to minus one
-  tree$numOfLeaves <- leaf_id_index - 1;
-  tree$longestDepth <- root_height;
+  tree$numOfLeaves <- leaf_id_index - 1
+
+  tree$longestDepth <- root_height
+
 
   return(tree)
 }
-

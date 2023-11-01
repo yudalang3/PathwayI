@@ -1,6 +1,6 @@
 Package: PathwayIlluminator
 Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.1006
+Version: 0.0.0.1007
 Authors@R: 
     person("Dalang", "Yu", , "dalangyusci@gmail.com", role = c("aut", "cre"))
 Description: The beautifull pathway drawer.
@@ -9,6 +9,8 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests: 
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Imports: 
@@ -16,7 +18,9 @@ Imports:
     gridBezier,
     purrr,
     R6,
-    gridGeometry
+    gridGeometry,
+    dplyr
 Depends: 
     R (>= 2.10)
 LazyData: true
+VignetteBuilder: knitr

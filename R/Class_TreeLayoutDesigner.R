@@ -1,6 +1,10 @@
 # LayoutDesigner ----------------------------------------------------------
-# This is the layout designer.
-# THe subclass will implement the concrete visualize algorithms.
+# This is the layout designer. The main process it to compute the the node locations.
+# But it also has default plot/draw process. So the full name should be Tree layout designer and defualt drawer.
+#
+# If you want to visualize in different ways, please see the `Class_TreeDrawer.R` file and invoke the [[treeCustomizedDrawer()]] function
+#
+# The subclass will implement the concrete visualize algorithms.
 LayoutDesigner <-
   R6Class(
     classname = 'LayoutDesigner',
@@ -30,7 +34,7 @@ LayoutDesigner <-
             available_height = available_height
           )
 
-        set_global_pars('wh_blank_space',blank_space)
+        set_global_pars('wh_blank_space', blank_space)
 
         return(blank_space)
       },
@@ -88,8 +92,9 @@ CircularLayoutDesigner <-
 
           # 外部也可以直接设定这个值
           if (tree$outterRadius < 0) {
-            outterRadi <- tree$outterRadius <- min(available_width, available_height) * 0.5
-          }else {
+            outterRadi <-
+              tree$outterRadius <- min(available_width, available_height) * 0.5
+          } else {
             outterRadi <- tree$outterRadius
           }
           direction <- tree$direction
@@ -98,8 +103,12 @@ CircularLayoutDesigner <-
           longestDepth <- tree$longestDepth
           numOfLeaves <- tree$numOfLeaves
 
-          self$xCenter <- tree$xCenter <- available_width * 0.5 + blank_area$l;
-          self$yCenter <- tree$yCenter <- available_height * 0.5 + blank_area$b;
+          self$xCenter <-
+            tree$xCenter <- available_width * 0.5 + blank_area$l
+
+          self$yCenter <-
+            tree$yCenter <- available_height * 0.5 + blank_area$b
+
 
           if (extendDegree == 360) {
             numOfIntervals <- numOfLeaves
@@ -113,10 +122,10 @@ CircularLayoutDesigner <-
           oneUnitDepth <- (outterRadi - innerRadi) / longestDepth
           leafNumberIndex <- 0
 
-          set_global_pars('leafIntervalLength',intervalLength)
-          set_global_pars('oneUnitDepth',oneUnitDepth)
-          set_global_pars('xCenter',self$xCenter)
-          set_global_pars('yCenter',self$yCenter)
+          set_global_pars('leafIntervalLength', intervalLength)
+          set_global_pars('oneUnitDepth', oneUnitDepth)
+          set_global_pars('xCenter', self$xCenter)
+          set_global_pars('yCenter', self$yCenter)
 
           calcul <- function(node, cumulatedDepth) {
             depth <- cumulatedDepth + node$branchLength
@@ -173,7 +182,7 @@ CircularLayoutDesigner <-
           grid.circle(
             x = node_coor[1],
             y = node_coor[2],
-            r = unit(3,'pt'),
+            r = unit(3, 'pt'),
             gp = gpar(fill = 'black', col = NA),
             default.units = 'in'
           )
@@ -195,8 +204,10 @@ CircularLayoutDesigner <-
           radius_node <- node$xAxis_or_radius
           angle_node <- node$yAxis_or_angle
 
-          xCenter <- self$xCenter;
-          yCenter <- self$yCenter;
+          xCenter <- self$xCenter
+
+          yCenter <- self$yCenter
+
 
           parent_coor <-
             polar2cartesianCoor(radius_parent, angle_parent, xCenter, yCenter)
@@ -217,7 +228,12 @@ CircularLayoutDesigner <-
             default.units = 'in'
           )
 
-          draw_arc(angle_node, angle_parent, radius_parent, xCenter, yCenter,default_unit = 'in')
+          draw_arc(angle_node,
+                   angle_parent,
+                   radius_parent,
+                   xCenter,
+                   yCenter,
+                   default_unit = 'in')
         }
 
     )
@@ -243,13 +259,14 @@ RectangularLayoutDesigner <-
         numOfLeaves <- tree$numOfLeaves
 
         numOfIntervals <- numOfLeaves - 1
-        intervalLength <- panelInfo$available_height / numOfIntervals
+        intervalLength <-
+          panelInfo$available_height / numOfIntervals
         oneUnitDepth <- panelInfo$available_width / longestDepth
 
         leafNumberIndex <- 0
 
-        set_global_pars('leafIntervalLength',intervalLength)
-        set_global_pars('oneUnitDepth',oneUnitDepth)
+        set_global_pars('leafIntervalLength', intervalLength)
+        set_global_pars('oneUnitDepth', oneUnitDepth)
 
         calcul <- function(node, cumulatedDepth) {
           depth <- cumulatedDepth + node$branchLength
@@ -317,7 +334,11 @@ RectangularLayoutDesigner <-
         x1 <- x_parent
         y1 <- y_node
 
-        grid.lines(x = c(x_parent, x1, x_node), y = c( y_parent, y1, y_node),default.units = 'in')
+        grid.lines(
+          x = c(x_parent, x1, x_node),
+          y = c(y_parent, y1, y_node),
+          default.units = 'in'
+        )
         # grid.lines(x = c(x_parent, x_node), y = c(y_parent, y_node))
         # draw_bezier_twoPoints(
         #   x0 = x_parent,

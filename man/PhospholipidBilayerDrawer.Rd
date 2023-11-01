@@ -9,6 +9,12 @@ The draw of the phospholipid is repeated, so it should has a drawer class.
 \examples{
 
 ## ------------------------------------------------
+## Method `PhospholipidBilayerDrawer$calculate_lipid_along_curve`
+## ------------------------------------------------
+
+calculate_lipid_along_curve(1:5,1:5)
+
+## ------------------------------------------------
 ## Method `PhospholipidBilayerDrawer$draw_one_unit_lipid`
 ## ------------------------------------------------
 
@@ -25,23 +31,66 @@ painter$draw_lipid_along_curve(x = x, y = y)
 \describe{
 \item{\code{current_lipid_model}}{The model of the lipid}
 
-\item{\code{lipid_head_par}}{The graphics par}
+\item{\code{lipid_head_par}}{The graphics par of the header}
+
+\item{\code{lipid_line_par}}{The graphics par of the line}
 
 \item{\code{desired_hight}}{The height in inch's}
+
+\item{\code{percentage_of_off_track}}{The percentage off track, higher the white line thicker, should >0 & <1.}
 
 \item{\code{draw_circle_head}}{most draw head as a circle in a curve}
 
 \item{\code{draw_only_upLayer}}{draw only the up layer}
+
+\item{\code{painting_parameters}}{store for the parameters for painting. (for more complex functions it can be used)
+calculate lipid along curve, return the needed values for ploting.}
 }
 \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-PhospholipidBilayerDrawer-calculate_lipid_along_curve}{\code{PhospholipidBilayerDrawer$calculate_lipid_along_curve()}}
 \item \href{#method-PhospholipidBilayerDrawer-draw_lipid_along_curve}{\code{PhospholipidBilayerDrawer$draw_lipid_along_curve()}}
 \item \href{#method-PhospholipidBilayerDrawer-draw_one_unit_lipid}{\code{PhospholipidBilayerDrawer$draw_one_unit_lipid()}}
 \item \href{#method-PhospholipidBilayerDrawer-clone}{\code{PhospholipidBilayerDrawer$clone()}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PhospholipidBilayerDrawer-calculate_lipid_along_curve"></a>}}
+\if{latex}{\out{\hypertarget{method-PhospholipidBilayerDrawer-calculate_lipid_along_curve}{}}}
+\subsection{Method \code{calculate_lipid_along_curve()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PhospholipidBilayerDrawer$calculate_lipid_along_curve(
+  lineX,
+  lineY,
+  closedPolygon = F
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{lineX}}{the x axis points}
+
+\item{\code{lineY}}{the y axis points}
+
+\item{\code{closedPolygon}}{the input x,y line is a polygon}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the list of calculated values
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{calculate_lipid_along_curve(1:5,1:5)
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PhospholipidBilayerDrawer-draw_lipid_along_curve"></a>}}
@@ -54,7 +103,11 @@ It will handle the angle automatically. Note the denser the dots, the more they 
 
 Draw one unit lipid model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PhospholipidBilayerDrawer$draw_lipid_along_curve(lineX, lineY)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PhospholipidBilayerDrawer$draw_lipid_along_curve(
+  lineX,
+  lineY,
+  closedPolygon = F
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -64,7 +117,7 @@ Draw one unit lipid model
 
 \item{\code{lineY}}{y values}
 
-\item{\code{lastDraw}}{should draw last model, default F}
+\item{\code{closedPolygon}}{the input x,y line is a polygon}
 }
 \if{html}{\out{</div>}}
 }
@@ -79,7 +132,8 @@ Draw one unit lipid model
   scaleHeight = 1,
   theta,
   moveX,
-  moveY
+  moveY,
+  r = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -95,6 +149,8 @@ Draw one unit lipid model
 \item{\code{moveX}}{the moved x distance}
 
 \item{\code{moveY}}{the moved y distance}
+
+\item{\code{r}}{the unit for the header circle, if \code{draw_circle_head=T}, this value should be assigned}
 }
 \if{html}{\out{</div>}}
 }

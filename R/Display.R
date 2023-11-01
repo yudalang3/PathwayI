@@ -1,3 +1,50 @@
+
+#' Generate the grid for assistant.
+#'
+#' Most of the time, we need to use the coordinates to locate the complex.
+#'
+#' @param interval the gap, in inch unit
+#'
+#' @export
+#'
+#' @examples
+#' show_grid_forAssistance(0.5)
+show_grid_forAssistance <- function(interval = 1) {
+  deviceDim <- par('din')
+  width_int <- ceiling(deviceDim[1])
+  hight_int <- ceiling(deviceDim[2])
+
+  w_seq <- seq.int(from = 0, to = width_int, by = interval)
+  h_seq <- seq.int(from = 0, to = hight_int, by = interval)
+
+  lineGpar <- gpar(col = 'grey', lty = 'dashed')
+  walk(w_seq, function(x) {
+    grid.segments(
+      x0 = x,
+      y0 = 0,
+      x1 = x,
+      y1 = hight_int,
+      default.units = 'in',
+      gp = lineGpar
+    )
+  })
+
+  grid.text(label = w_seq, x = w_seq , y = 0.06, default.units = 'in', gp = lineGpar,vjust = 0, hjust = 0)
+
+  walk(h_seq, function(y) {
+    grid.segments(
+      x0 = 0,
+      y0 = y,
+      x1 = width_int,
+      y1 = y,
+      default.units = 'in',
+      gp = lineGpar
+    )
+  })
+
+  grid.text(label = h_seq[-1], x = 0 , y = h_seq[-1] , default.units = 'in', gp = lineGpar,vjust = 0, hjust = 0)
+}
+
 #' Display the supported phospholipid models.
 #'
 #' @export
@@ -144,45 +191,94 @@ show_pathway_models <- function(){
 
 }
 
+#' Display a basic surface model.
+#'
+#' @export
+#'
+#' @examples
+#' show_surface_models()
 show_surface_models <- function(){
 
   painter <- create_lipidBilayer_drawer(draw_circle_head = T)
-  painter$draw_only_upLayer <- T
-  painter$desired_hight <- 0.4
+  painter$lipid_head_par <- gpar(fill = 'lightblue', col = 'blue4')
+
+  yStartLocations <- seq.int(from = 3.6, to = 3, by = -0.05)
+  xPaintingValue <- seq.int(from = 1, to = 4, by = 0.12)
 
   grid.newpage()
 
-  for (i in seq.int(from = 3, to = 2, by = -0.06)) {
-    x <- seq.int(from = i - 1, to = i + 3, by = 0.2)
-    y <- rep(i,length(x))
-    painter$draw_lipid_along_curve(lineX = x, lineY = y)
-  }
+  last_index <- length(yStartLocations)
 
-  ligand <-
-    create_freeShape_node(xyPoints_shape = basic_bioGraphics_templates[['basic_ligand']]$points,
-                          inner_extension_ratio = 0.2)
-  ligand$xAxis_or_radius <- x[1]
-  ligand$yAxis_or_angle <- y[1] + 0.5
-  ligand$circle_radius <- 1
-  ligand$label <- "ligand"
-  ligand$draw_me()
+  iwalk(yStartLocations, function(yStartLocation, i) {
+    num_of_phospholipid <- length(xPaintingValue)
+    yy <- rep(yStartLocation, num_of_phospholipid)
 
-  receptor <-
-    create_freeShape_node(xyPoints_shape = basic_bioGraphics_templates[['basic_receptor']]$points,
-                          inner_extension_ratio = 0.15)
-  receptor$xAxis_or_radius <- x[1]
-  receptor$yAxis_or_angle <- y[1]
-  receptor$circle_radius <- 1
-  receptor$gpar_shape <- gpar(fill = 'white')
-  receptor$label <- "receptor"
-  receptor$draw_me()
+    xPaintingValue <- xPaintingValue + i * 0.1
+
+    if (i == last_index) {
+      painter$draw_lipid_along_curve(lineX = xPaintingValue, lineY = yy)
+    } else {
+      ret <-
+        painter$calculate_lipid_along_curve(lineX = xPaintingValue[1:num_of_phospholipid], lineY = yy[1:num_of_phospholipid])
+
+      scaleHeight <- ret$scaleHeight
+      thetaList <- ret$theta_list
+      scaleWidth_1 <- ret$scaleWidth_1
+      scaleWidth_2 <- ret$scaleWidth_2
+      df_layer1 <- ret$df_layer1
+      df_layer2 <- ret$df_layer2
+      half_distance_all_1 <- ret$half_distance_all_1
+      half_distance_all_2 <- ret$half_distance_all_2
+
+      num_of_phospholipid_toDraw <- 2:ncol(df_layer1)
+      grid.circle(
+        x = df_layer1[1, num_of_phospholipid_toDraw],
+        y = df_layer1[2, num_of_phospholipid_toDraw],
+        r = half_distance_all_1,
+        default.units = 'in',
+        gp = painter$lipid_head_par
+      )
+
+      painter$draw_one_unit_lipid(
+        scaleWidth = scaleWidth_1[1],
+        scaleHeight = scaleHeight,
+        theta = thetaList[1],
+        moveX = df_layer1[1, 1],
+        moveY = df_layer1[2, 1],
+        r = half_distance_all_1[1]
+      )
+
+      theta2 <- thetaList[1] + degree_of_180_inRadian
+
+      painter$draw_one_unit_lipid(
+        scaleWidth = scaleWidth_2[1],
+        scaleHeight = scaleHeight,
+        theta = theta2,
+        moveX = df_layer2[1, 1],
+        moveY = df_layer2[2, 1],
+        r = half_distance_all_1[2]
+      )
+    }
+
+  })
 
 
-  kinase <-
-    create_oval_node(scaleHeight = 0.6, inner_extension_ratio = 0.15)
-  kinase$xAxis_or_radius <- x[1] - 0.3
-  kinase$yAxis_or_angle <- y[1] - 1.75
-  kinase$circle_radius <- 0.5
-  kinase$label <- "kinase"
-  kinase$draw_me()
+}
+
+#' Display the round rectangle bi-layer phospholipid model
+#'
+#' @export
+#'
+#' @examples
+#' show_roundRect_biLayer()
+show_roundRect_biLayer <- function(){
+  painter <- create_lipidBilayer_drawer(draw_circle_head = F)
+  painter$lipid_head_par <- gpar(fill = 'lightblue', col = 'blue4')
+  painter$draw_only_upLayer <- F
+
+  coords <- create_round_rectangle_xyCoords(x = 1, y = 1, w = 5, h = 4, r = 1, space = 0.1,angle_for_roundCorner = 6)
+
+  grid.newpage()
+
+  painter$draw_lipid_along_curve(lineX = coords[1, ],  lineY = coords[2, ],closedPolygon = T)
 }

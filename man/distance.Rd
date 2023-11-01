@@ -2,7 +2,8 @@
 % Please edit documentation in R/Class_Geometric.R
 \name{distance}
 \alias{distance}
-\title{Get distance from two points.}
+\title{Get distance from two points.
+Vectorised operations are supported.}
 \usage{
 distance(x0, y0, x1, y1)
 }
@@ -20,6 +21,7 @@ distance
 }
 \description{
 Get distance from two points.
+Vectorised operations are supported.
 }
 \examples{
 distance(0,0,1,1)

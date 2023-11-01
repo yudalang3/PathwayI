@@ -1,44 +1,4 @@
 # Create tree manually ----------------------------------------------------
-node1 <- GraphicNode$new(1)
-node2 <- GraphicNode$new(2)
-
-node1.2 <- GraphicNode$new()
-node1.2$addChild(node1)
-node1.2$addChild(node2)
-
-node3 <- GraphicNode$new(3)
-node4 <- GraphicNode$new(4)
-
-node3.4 <- GraphicNode$new()
-node3.4$addChild(node3)
-node3.4$addChild(node4)
-
-root <- GraphicNode$new()
-root$addChild(node1.2);
-root$addChild(node3.4)
-
-displayTheTree(root)
-
-assignTheCGBID(root)
-displayTheTree(root)
-
-tree <- GraphicTree$new(root)
-tree$assignAttributes()
-
-# set the root node length to be 0
-root$branchLength <- 0
-rectLayoutDesigner<- RectangularLayoutDesigner$new()
-rectLayoutDesigner$calculate(tree)
-rectLayoutDesigner$plotTree(tree)
-
-circLayoutDesigner <- CircularLayoutDesigner$new();
-#  adjust the start degree to make it more beautiful
-tree$startDegree <- 0
-tree$extendDegree <- 90
-tree$innerRadius <- 1
-circLayoutDesigner$calculate(tree)
-circLayoutDesigner$plotTree(tree)
-
 
 #
 # # 压力测试
@@ -50,38 +10,6 @@ circLayoutDesigner$plotTree(tree)
 # lobstr::obj_size(root)
 # displayTheTree(root$rootNode)
 #
-
-# Create tree by simulation ----------------------------------------------------
-ret <- process_createNodes(3,numOfChildren = 6)
-displayTheTree(ret$rootNode)
-
-ret$innerRadius <- 1
-circLayoutDesigner <- CircularLayoutDesigner$new();
-circLayoutDesigner$calculate(ret)
-circLayoutDesigner$plotTree(ret)
-
-rectLayoutDesigner<- RectangularLayoutDesigner$new()
-rectLayoutDesigner$calculate(ret)
-rectLayoutDesigner$plotTree(ret)
-
-# Get Tree From the hclust object ----------------------------------------------------
-hc <- hclust(dist(USArrests), "ave")
-dendrogram <- as.dendrogram(hc)
-intuitiveTree <- process_dendrogram2intuitiveTree(dendrogram)
-displayTheTree(intuitiveTree$rootNode)
-
-intuitiveTree$innerRadius <- 2
-intuitiveTree$outterRadius <- 0.7
-circLayoutDesigner <- CircularLayoutDesigner$new();
-circLayoutDesigner$calculate(intuitiveTree)
-circLayoutDesigner$plotTree(intuitiveTree)
-
-rectLayoutDesigner<- RectangularLayoutDesigner$new()
-rectLayoutDesigner$calculate(intuitiveTree)
-rectLayoutDesigner$plotTree(intuitiveTree)
-
-plot(dendrogram, horiz = T)
-
 
 # customized tree drawer
 hc <- hclust(dist(USArrests), "ave")

@@ -1,42 +1,3 @@
-#' Define the constont values
-ONE_DEGREE_IN_RADIAN <- pi / 180
-degree_of_180_inRadian <- 180 * ONE_DEGREE_IN_RADIAN
-degree_of_90_inRadian <- 90 * ONE_DEGREE_IN_RADIAN
-
-#' Polar coordinates to Cartesian coordinates.
-#' @description
-#' The function supports the vectorised invoke usage.
-#' The implementation employs the euler's formula to accelerate the computation.
-#' NOTE the radius and location (xCenter, yCenter) should be the same unit with values(NOT unit instances).
-#'
-#' @param radius: the circular radius
-#' @param angle: unit is in degrees, NOT radian.
-#' @param xCenter: the xCenter coordinate point
-#' @param yCenter: the yCenter coordinate point
-#'
-#' @return: first column is the sin related values, second column is cos related values.
-#' @export
-#'
-#' @examples
-#' polar2cartesianCoor(1,5)
-#'
-polar2cartesianCoor <- function(radius,
-                                angle,
-                                xCenter = 0.5,
-                                yCenter = 0.5) {
-  radian <- angle * ONE_DEGREE_IN_RADIAN
-
-  # Way 1:
-  # x <- radius * cos(radian) + xCenter
-  # y <- radius * sin(radian) + yCenter
-  # cbind(x, y)
-
-  # Way 2:
-  cc <- exp((1i) * radian)
-  cbind(Im(cc) * radius + xCenter, Re(cc) * radius + yCenter)
-}
-
-
 #' Draw a sector.
 #' @description
 #' What? you do not know the sector? Try to google it.
@@ -85,8 +46,8 @@ draw_sector <-
         yCenter = yCenter
       )
 
-    xx_out <- coor[, 1]
-    yy_out <- coor[, 2]
+    xx_out <- coor[1, ]
+    yy_out <- coor[2, ]
 
 
     equal_spersed_degrees <-
@@ -102,8 +63,8 @@ draw_sector <-
         xCenter = xCenter,
         yCenter = yCenter
       )
-    xx_inner <- coor[, 1]
-    yy_inner <- coor[, 2]
+    xx_inner <- coor[1, ]
+    yy_inner <- coor[2, ]
 
 
     glob <-
@@ -163,8 +124,8 @@ draw_arc <- function(startDegree,
   coor <-
     polar2cartesianCoor(radius = radius, angle = intervals, xCenter, yCenter)
 
-  grid.lines(x = coor[, 1],
-             y = coor[, 2],
+  grid.lines(x = coor[1, ],
+             y = coor[2, ],
              default.units = default_unit)
 }
 
@@ -277,4 +238,70 @@ draw_bezier_fourPoints <-
     # grid.circle(xx,yy, r = unit(2,"mm") ,default.units = default_unit)
     # grid.circle(xx[3],yy[3], r = unit(3,"mm") ,default.units = default_unit)
     ## top is not needed.
+  }
+
+#' Draw the 2xn matrix in points
+#'
+#' @param default.units default is in
+#' @param ... the 2xn matrix list
+#'
+#' @return null
+#' @export
+#'
+#' @examples
+#' draw_2xn_matrix_points(rbind(1:5,rep(3,5)))
+draw_2xn_matrix_points <- function(... , default.units = 'in') {
+  all_objs <- list(...)
+  walk(all_objs, function(x) {
+    grid.lines(x[1,], x[2,], default.units = default.units)
+  })
+}
+
+
+#' draw_lineArrow_accordingTo_grobAndPoints
+#'
+#' @param node1 grob 1
+#' @param node2 grob 2
+#' @param x1 x1
+#' @param y1 y1
+#' @param x2 x2
+#' @param y2 y2
+#' @param arrow the arrow instance
+#' @param ... arguments pass to the grid.lines() function
+#'
+#' @export
+#' @importFrom gridGeometry trimGrob
+#'
+#' @examples
+#' node1 <- get_global_bioGraphics_nodes_list()[['ligand']]
+#' node2 <- get_global_bioGraphics_nodes_list()[['receptor']]
+#' ligand$xAxis_or_radius, receptor$xAxis_or_radius
+#' ligand$yAxis_or_angle, receptor$yAxis_or_angle
+#' draw_lineArrow_accordingTo_grobAndPoints(node1,node2,x1,y1,x2,y2)
+draw_lineArrow_accordingTo_grobAndPoints <-
+  function(node1, node2, x1, y1, x2, y2, arrow = NULL, ...) {
+    line <- linesGrob(x = c(x1, x2),
+                      y = c(y1, y2),
+                      default.units = 'in')
+
+
+    p <- polyclipGrob(line,
+                      gList(node1, node2),
+                      op = "minus",
+                      gp = gpar(lwd = 2))
+
+    p <- trimGrob(p, from = 0.1, to = 0.9)
+    # grid.newpage()
+    # grid.draw(node1)
+    # grid.draw(node2)
+    # grid.draw(line)
+    #
+    # grid.draw(p)
+    temp <- grobCoords(p, closed = F)
+    a <- temp[[1]][[1]]
+    if (is.null(arrow)) {
+      arrow <- arrow()
+    }
+    grid.lines(a$x, a$y, arrow = arrow, default.units = 'in', ...)
+
   }

@@ -1,0 +1,278 @@
+---
+title: "introduce_the_graphicNodesBased_treeStructure"
+output: rmarkdown::html_vignette
+date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
+vignette: >
+  %\VignetteIndexEntry{introduce_the_graphicNodesBased_treeStructure}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width=7, fig.height=5,
+  fig.align = "center"
+)
+```
+
+
+I frequently use the `grid` and `purrr` package, so besides load the `PathwayIlluminator`, these two packages are needed.
+
+```{r setup}
+library(PathwayIlluminator)
+library(grid)
+library(purrr)
+```
+
+## Why I introduce the graphic node based tree structure first
+
+Because in the signaling pathway, the basic three unit is edge, node and membrane (phospholipid bi-layer lipid). The membrane can be expressed as the x,y coordinates lines with phospholipid on the two sides. Another important structure need to consider it how to represent the edge and node in the computer, we think the edge could be attached to the node. So the main question is how to construct the node data structure.
+
+If you have the other programming languages usage experiences, like C++/JAVA/Python. you will know that, the tree like structures can be struct in C++, class in JAVA and Python. They all support the `reference semantics`, so the tree can be expressed as a node in node structure with list of nodes as children in other nodes. While in R, all things has changed, cause the complicated data structure in the R lang. To get proficient in the R data structure, you need to read the C source codes of the R, the core is the `SEXP` struct. But, luckily, the usage become rather easy.
+
+At first, we expressed the tree-like structure in `list in list` style. In R, all data structures are represented as the list. You can nest the list with infinite list. This is the convenient way for users to construct the applications without need to thought how the list is implemented. Unfortunately, R lang has another feature "copy-on-modify" which is a mechanism to prevent the side effects of the function. Thus, the default R object is not support the `reference semantics`. So, we need to use the R environment and R6 Object oriented programming system to build the tree structure.
+
+# How to use the tree-like structure
+
+## How to create the tree manualy and manipulate the tree
+
+The following codes can create the tree manual, although almost no one will do in this way.
+
+The purpose is to teach you clearly that how the tree is constructed.
+
+```{r manulyCreate}
+node1 <- GraphicNode$new(1)
+node2 <- GraphicNode$new(2)
+
+node1.2 <- GraphicNode$new()
+node1.2$addChild(node1)
+node1.2$addChild(node2)
+
+node3 <- GraphicNode$new(3)
+node4 <- GraphicNode$new(4)
+
+node3.4 <- GraphicNode$new()
+node3.4$addChild(node3)
+node3.4$addChild(node4)
+
+root <- GraphicNode$new()
+root$addChild(node1.2);
+root$addChild(node3.4)
+```
+
+how to display the tree? you just type the `?displayTheTree` to see the function. we type the code here to see the results.
+
+In order to understand the results, briefly the results are presented as parent id and child id.
+
+-   This is not an intuitive way and this function is suitable for the small scale tree (for tree less than 20 leaves.)
+-   You may need to use a scratch paper to draw it with a pen.
+-   The parent id and children it can describe the topology information.
+-   The attached node information is in the remaining columns.
+
+```{r display}
+displayTheTree(root)
+```
+
+You will see the `NA` in the print, try to run the following codes to avoid the NA.
+
+```{r}
+# To assign the id for the internal node.
+assignTheCGBID(root)
+displayTheTree(root)
+```
+
+The CGB id is a `nomenclature system` to name the internal node, try to find more information by type `?assignTheCGBID`.
+
+## How to visualize the tree
+
+Next, you question will be how to see the visualization results?
+
+```{r displayTree}
+# construct the tree instance
+tree <- create_treeObj(root)
+
+# set the root node length to be 0
+root$branchLength <- 0
+rectLayoutDesigner<- RectangularLayoutDesigner$new()
+rectLayoutDesigner$calculate(tree)
+rectLayoutDesigner$plotTree(tree)
+
+circLayoutDesigner <- CircularLayoutDesigner$new();
+#  adjust the start degree to make it more beautiful
+tree$startDegree <- 0
+tree$extendDegree <- 90
+tree$innerRadius <- 0.3
+circLayoutDesigner$calculate(tree)
+circLayoutDesigner$plotTree(tree)
+```
+
+## Create the tree by simulation
+
+```{r}
+# Create tree by simulation ----------------------------------------------------
+ret <- process_createNodes(3,numOfChildren = 6)
+# displayTheTree(ret$rootNode)
+
+ret$innerRadius <- 1
+circLayoutDesigner <- CircularLayoutDesigner$new();
+circLayoutDesigner$calculate(ret)
+circLayoutDesigner$plotTree(ret)
+
+rectLayoutDesigner<- RectangularLayoutDesigner$new()
+rectLayoutDesigner$calculate(ret)
+rectLayoutDesigner$plotTree(ret)
+```
+
+##  Get Tree From the hclust object
+
+```{r}
+hc <- hclust(dist(USArrests), "ave")
+dendrogram <- as.dendrogram(hc)
+intuitiveTree <- process_dendrogram2intuitiveTree(dendrogram)
+# displayTheTree(intuitiveTree$rootNode)
+
+## get the inner tree viewer
+intuitiveTree$innerRadius <- 2
+intuitiveTree$outterRadius <- 0.7
+circLayoutDesigner <- CircularLayoutDesigner$new();
+circLayoutDesigner$calculate(intuitiveTree)
+circLayoutDesigner$plotTree(intuitiveTree)
+
+## get the outter tree viewer
+intuitiveTree$innerRadius <- 0.2
+intuitiveTree$outterRadius <- 2
+circLayoutDesigner <- CircularLayoutDesigner$new();
+circLayoutDesigner$calculate(intuitiveTree)
+circLayoutDesigner$plotTree(intuitiveTree)
+
+rectLayoutDesigner<- RectangularLayoutDesigner$new()
+rectLayoutDesigner$calculate(intuitiveTree)
+rectLayoutDesigner$plotTree(intuitiveTree)
+
+## To see the original figure to make a comparison 
+plot(dendrogram, horiz = T)
+
+```
+
+
+# So, what is the relationship with the pathway
+
+There are at least two types of places, you may need to use the tree-like structure:
+
+* Type1: Let us consider the membrane protein complex or other polymer proteins, it is the tree like structure.
+* Type2: The relationship of the complex/node to other complex/node may be a tree. Most of them are not, it is a network.
+
+Take the first type for example, let us draw a picture by taking the advantage of this package.
+
+```{r illustrateStructure}
+# pdf(file = 'picture.pdf',family = 'GB1')
+painter <- create_lipidBilayer_drawer(draw_circle_head = T)
+painter$lipid_head_par <- gpar(fill = 'lightblue', col = 'blue4')
+
+yStartLocations <- seq.int(from = 3.6, to = 3, by = -0.05)
+xPaintingValue <- seq.int(from = 0.5, to = 5, by = 0.12)
+
+grid.newpage()
+last_index <- length(yStartLocations)
+## Draw the three-dimensional phospholipid bilayer
+iwalk(yStartLocations, function(yStartLocation, i) {
+  num_of_phospholipid <- length(xPaintingValue)
+  yy <- rep(yStartLocation, num_of_phospholipid)
+
+  xPaintingValue <- xPaintingValue + i * 0.1
+
+  if (i == last_index) {
+    painter$draw_lipid_along_curve(lineX = xPaintingValue, lineY = yy)
+  } else {
+    ret <-
+      painter$calculate_lipid_along_curve(lineX = xPaintingValue[1:num_of_phospholipid], lineY = yy[1:num_of_phospholipid])
+
+    scaleHeight <- ret$scaleHeight
+    thetaList <- ret$theta_list
+    scaleWidth_1 <- ret$scaleWidth_1
+    scaleWidth_2 <- ret$scaleWidth_2
+    df_layer1 <- ret$df_layer1
+    df_layer2 <- ret$df_layer2
+    half_distance_all_1 <- ret$half_distance_all_1
+    half_distance_all_2 <- ret$half_distance_all_2
+
+    num_of_phospholipid_toDraw <- 2:ncol(df_layer1)
+    grid.circle(
+      x = df_layer1[1, num_of_phospholipid_toDraw],
+      y = df_layer1[2, num_of_phospholipid_toDraw],
+      r = half_distance_all_1,
+      default.units = 'in',
+      gp = painter$lipid_head_par
+    )
+
+    painter$draw_one_unit_lipid(
+      scaleWidth = scaleWidth_1[1],
+      scaleHeight = scaleHeight,
+      theta = thetaList[1],
+      moveX = df_layer1[1, 1],
+      moveY = df_layer1[2, 1],
+      r = half_distance_all_1[1]
+    )
+
+    theta2 <- thetaList[1] + degree_of_180_inRadian
+
+    painter$draw_one_unit_lipid(
+      scaleWidth = scaleWidth_2[1],
+      scaleHeight = scaleHeight,
+      theta = theta2,
+      moveX = df_layer2[1, 1],
+      moveY = df_layer2[2, 1],
+      r = half_distance_all_1[2]
+    )
+  }
+
+  lipid_along_line <<- create_point(x = xPaintingValue, y = yy)
+})
+
+## draw the receptors
+receptor1 <-
+  create_oval_node(scaleHeight = 0.6, inner_extension_ratio = 0.15)
+receptor1$xAxis_or_radius <- lipid_along_line@x[6]
+receptor1$yAxis_or_angle <- lipid_along_line@y[6]
+receptor1$circle_radius <- 0.5
+receptor1$gpar_shape <- gpar(fill = 'white')
+receptor1$label <- "receptor"
+receptor1$text_position <- c(0.5,0)
+receptor1$draw_me()
+
+receptor2 <-
+  create_selfContained_simple_bioGraphicsNode(name = 'bCatenin')
+receptor2$xAxis_or_radius <- lipid_along_line@x[15]
+receptor2$yAxis_or_angle <- lipid_along_line@y[15]
+receptor2$circle_radius <- 1
+receptor2$gpar_shape <- gpar(fill = 'white')
+receptor2$label <- "b-Catenin"
+receptor2$text_position <- c(0.5,0)
+receptor2$draw_me()
+
+receptor3 <-
+  create_selfContained_simple_bioGraphicsNode(name = 'LRP_2')
+receptor3$xAxis_or_radius <- lipid_along_line@x[22]
+receptor3$yAxis_or_angle <- lipid_along_line@y[22]
+receptor3$circle_radius <- 0.15
+receptor3$gpar_shape <- gpar(fill = 'white')
+receptor3$label <- "LRP"
+receptor3$text_position <- c(0.5,0)
+receptor3$draw_me()
+
+receptor4 <-
+  create_selfContained_simple_bioGraphicsNode(name = 'FZD_1')
+receptor4$xAxis_or_radius <- lipid_along_line@x[30]
+receptor4$yAxis_or_angle <- lipid_along_line@y[30]
+receptor4$circle_radius <- 1
+receptor4$gpar_shape <- gpar(fill = 'white')
+receptor4$label <- "FZD"
+receptor4$text_position <- c(0.5,0)
+receptor4$draw_me()
+
+```
+
+
+As you can see in the figure, let us focus the LRP membrane protein. It is a tree-like structure where one root has four children.

@@ -1,5 +1,3 @@
-
-
 #' Draw the tree with customized ways.
 #'
 #' @description
@@ -68,7 +66,6 @@ treeCustomizedDrawer <-
            root_node_drawer,
            inner_node_drawer,
            leaf_drawer) {
-
     if (!inherits(tree , what = 'GraphicTree')) {
       stop("You should input a class of GraphicTree")
     }
@@ -81,6 +78,7 @@ treeCustomizedDrawer <-
 
     if (is.null(inner_node_drawer)) {
       inner_node_drawer <- function(x, y) {
+
       }
     }
     if (is.null(leaf_drawer)) {

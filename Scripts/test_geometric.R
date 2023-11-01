@@ -1,3 +1,6 @@
+# These files are test for the very very basic functions, much theoretical for the user
+# do not suitable for writing the vignette
+
 w_and_h <- par('din')
 
 xx <- seq(from = 1, to = w_and_h[1] - 1, length.out = 40)
