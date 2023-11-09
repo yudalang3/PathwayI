@@ -2,23 +2,27 @@
 % Please edit documentation in R/Global_variables.R
 \name{set_global_pars}
 \alias{set_global_pars}
-\title{Set the parameters for the global value.}
+\title{Set the parameters for the global value. see the description for details.}
 \usage{
 set_global_pars(name, value)
 }
 \arguments{
 \item{name}{e.g. blank_area_ratio}
 
-\item{value}{the value could be list or single value or automic vector}
+\item{value}{the value could be list or single value or atomic vector}
 }
 \description{
 There will be a lot of parameters to set for the plot, so this is the final entry to set the prameters.
 
 currently supportted parameters:
-\code{fontsize} : the default fontsize of the text
 \code{blank_area_ratio} : the blank area ratio of the picture, like margin in the 2D plot
+\code{gpar_text} : the text graphic parameters
+
+Note: see \code{\link[=set_global_text_pars]{set_global_text_pars()}} if you only want to change the properties of the text.
+
+In most cases, the text properties are highly demand to be global.
 }
 \examples{
 set_global_pars('blank_area_ratio', list(l = 0.05, r = 0.05, t = 0.02, b = 0.02))
-set_global_pars('fontsize', 7)
+set_global_pars('gpar_text', gpar(col = 'blue', fontsize = 7))
 }

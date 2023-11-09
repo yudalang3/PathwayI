@@ -137,24 +137,21 @@ create_round_rectangle_xyCoords <-
       stop('Please check your input w,h,r and space. The space should <= r and r<= w, r<=h ')
     }
 
-    xStart <- x
-    yStart <- y
-
     ## directly is in radian
     angle_of_space <- angle_for_roundCorner * ONE_DEGREE_IN_RADIAN
 
     all_points <-
       seq.int(from = 0,
-              to = degree_of_90_inRadian,
+              to = degree_of_90_inRadian - 0.0000001,
               by = angle_of_space)
     break_points_rightTop <-
       produce_model_coordinate_points(break_points = all_points, radius = r)
 
 
-    break_points_rightTop[1, ] <-
-      break_points_rightTop[1, ] + x + w - r
-    break_points_rightTop[2, ] <-
-      break_points_rightTop[2, ] + y + h - r
+    break_points_rightTop[1,] <-
+      break_points_rightTop[1,] + x + w - r
+    break_points_rightTop[2,] <-
+      break_points_rightTop[2,] + y + h - r
 
     all_points <-
       seq.int(from = degree_of_90_inRadian,
@@ -162,10 +159,10 @@ create_round_rectangle_xyCoords <-
               by = angle_of_space)
     break_points_rightBottom <-
       produce_model_coordinate_points(break_points = all_points, radius = r)
-    break_points_rightBottom[1, ] <-
-      break_points_rightBottom[1, ] + x + w - r
-    break_points_rightBottom[2, ] <-
-      break_points_rightBottom[2, ] + y + r
+    break_points_rightBottom[1,] <-
+      break_points_rightBottom[1,] + x + w - r
+    break_points_rightBottom[2,] <-
+      break_points_rightBottom[2,] + y + r
 
     all_points <-
       seq.int(from = degree_of_180_inRadian,
@@ -173,10 +170,10 @@ create_round_rectangle_xyCoords <-
               by = angle_of_space)
     break_points_leftBottom <-
       produce_model_coordinate_points(break_points = all_points, radius = r)
-    break_points_leftBottom[1, ] <-
-      break_points_leftBottom[1, ] + x + r
-    break_points_leftBottom[2, ] <-
-      break_points_leftBottom[2, ] + y + r
+    break_points_leftBottom[1,] <-
+      break_points_leftBottom[1,] + x + r
+    break_points_leftBottom[2,] <-
+      break_points_leftBottom[2,] + y + r
 
     all_points <-
       seq.int(from = degree_of_270_inRadian,
@@ -184,8 +181,9 @@ create_round_rectangle_xyCoords <-
               by = angle_of_space)
     break_points_leftTop <-
       produce_model_coordinate_points(break_points = all_points, radius = r)
-    break_points_leftTop[1, ] <- break_points_leftTop[1, ] + x + r
-    break_points_leftTop[2, ] <- break_points_leftTop[2, ] + y + h - r
+    break_points_leftTop[1,] <- break_points_leftTop[1,] + x + r
+    break_points_leftTop[2,] <-
+      break_points_leftTop[2,] + y + h - r
 
 
     line_top <-
@@ -254,9 +252,19 @@ create_round_rectangle_xyCoords <-
     )
 
     ## remove duplication
-    ##  I have try the for look with the thought of compare the current value and the next value
+    ##  I have try the for loop with the thought of compare the current value and the next value
     ##  But it need lots of operations, and it get slow. So I use this function.
-    ret <- distinct(data.frame(x = xyCoords[1,], y = xyCoords[2,]))
+    ##
+    ##  2023/11/08 still has the problem, the float number for dplyr to deteminate the deplication
+    ##  is too inaccurate.
+    ##  we need to round the value.
+    ret <-
+      distinct(data.frame(
+        x = round(xyCoords[1,], digits = 4),
+        y = round(xyCoords[2,], digits = 4)
+      ))
+
+    # browser()
 
     # grid.newpage()
     # grid.lines(x = xyCoords[1, ] ,
@@ -359,79 +367,83 @@ polar2cartesianCoor <- function(radius,
 #' x <- 1:5
 #' y <- x ^ (1 / 3) + 2
 #' do_bilateral_extension_alongCurve(x,y,d = 1.2)
-do_bilateral_extension_alongCurve <- function(x, y, d = 1 , closedPolygon = F) {
-  len_ofX <- checkCurvePoints(x, y)
+do_bilateral_extension_alongCurve <-
+  function(x,
+           y,
+           d = 1 ,
+           closedPolygon = F) {
+    len_ofX <- checkCurvePoints(x, y)
 
-  if (closedPolygon) {
-    x_a <- x[1:len_ofX]
-    y_a <- y[1:len_ofX]
-    x_b <- c(x[2:len_ofX],x[1])
-    y_b <- c(y[2:len_ofX],y[1])
-  }else {
-    x_a <- x[1:(len_ofX - 1)]
-    y_a <- y[1:(len_ofX - 1)]
-    x_b <- x[2:len_ofX]
-    y_b <- y[2:len_ofX]
+    if (closedPolygon) {
+      x_a <- x[1:len_ofX]
+      y_a <- y[1:len_ofX]
+      x_b <- c(x[2:len_ofX], x[1])
+      y_b <- c(y[2:len_ofX], y[1])
+    } else {
+      x_a <- x[1:(len_ofX - 1)]
+      y_a <- y[1:(len_ofX - 1)]
+      x_b <- x[2:len_ofX]
+      y_b <- y[2:len_ofX]
+    }
+
+    ## qq = - 1 / k
+    qq <- (x_a - x_b) / (y_b - y_a)
+
+    if (any(is.na(qq))) {
+      stop('The input data has duplicated x,y locations, please check your data.')
+    }
+
+    # browser()
+    t_square <- d * d / (1 + qq * qq)
+    # Do not need this at all, because the qq is Inf, so the value will be zero.
+    # t_square[is.infinite(qq)] <- 0
+    #
+    ## the choose of the t1 and t2 should be caution
+    ## when the slot is positive and negative the value should revert
+    t_1 <- sqrt(t_square)
+    t_1[qq > 0] <- -t_1[qq > 0]
+    t_1[x_b > x_a] <- -t_1[x_b > x_a]
+    ## add the y consideration
+    ##
+    is_qq_equal_zero_plus_yB_greater_yA <- (qq == 0 & y_b > y_a)
+    t_1[is_qq_equal_zero_plus_yB_greater_yA] <-
+      -t_1[is_qq_equal_zero_plus_yB_greater_yA]
+
+    t_2 <- -t_1
+
+
+    xPrime_1 <- t_1 + x_a
+
+    yPrime_1 <- t_1 * qq + y_a
+
+
+    xPrime_2 <- t_2 + x_a
+
+    yPrime_2 <- t_2 * qq + y_a
+
+    is_inf <- is.infinite(qq)
+
+    horizontal_to_right_indexes <- is_inf & qq < 0
+    yPrime_1[horizontal_to_right_indexes] <-
+      (y_a + d)[horizontal_to_right_indexes]
+    yPrime_2[horizontal_to_right_indexes] <-
+      (y_a - d)[horizontal_to_right_indexes]
+
+    horizontal_to_left_indexes <- is_inf & qq > 0
+    yPrime_1[horizontal_to_left_indexes] <-
+      (y_a - d)[horizontal_to_left_indexes]
+    yPrime_2[horizontal_to_left_indexes] <-
+      (y_a + d)[horizontal_to_left_indexes]
+
+    ret <-
+      list(
+        xPrime_1 = xPrime_1,
+        yPrime_1 = yPrime_1,
+        xPrime_2 = xPrime_2,
+        yPrime_2 = yPrime_2
+      )
+    return(ret)
   }
-
-  ## qq = - 1 / k
-  qq <- (x_a - x_b) / (y_b - y_a)
-
-  if (any(is.na(qq))) {
-    stop('The input data has duplicated x,y locations, please check your data.')
-  }
-
-  # browser()
-  t_square <- d * d / (1 + qq * qq)
-  # Do not need this at all, because the qq is Inf, so the value will be zero.
-  # t_square[is.infinite(qq)] <- 0
-  #
-  ## the choose of the t1 and t2 should be caution
-  ## when the slot is positive and negative the value should revert
-  t_1 <- sqrt(t_square)
-  t_1[qq > 0] <- -t_1[qq > 0]
-  t_1[x_b > x_a] <- -t_1[x_b > x_a]
-  ## add the y consideration
-  ##
-  is_qq_equal_zero_plus_yB_greater_yA <- qq == 0 & y_b > y_a
-  t_1[is_qq_equal_zero_plus_yB_greater_yA] <-
-    -t_1[is_qq_equal_zero_plus_yB_greater_yA]
-
-  t_2 <- -t_1
-
-
-  xPrime_1 <- t_1 + x_a
-
-  yPrime_1 <- t_1 * qq + y_a
-
-
-  xPrime_2 <- t_2 + x_a
-
-  yPrime_2 <- t_2 * qq + y_a
-
-  is_inf <- is.infinite(qq)
-
-  horizontal_to_right_indexes <- is_inf & qq < 0
-  yPrime_1[horizontal_to_right_indexes] <-
-    (y_a + d)[horizontal_to_right_indexes]
-  yPrime_2[horizontal_to_right_indexes] <-
-    (y_a - d)[horizontal_to_right_indexes]
-
-  horizontal_to_left_indexes <- is_inf & qq > 0
-  yPrime_1[horizontal_to_left_indexes] <-
-    (y_a - d)[horizontal_to_left_indexes]
-  yPrime_2[horizontal_to_left_indexes] <-
-    (y_a + d)[horizontal_to_left_indexes]
-
-  ret <-
-    list(
-      xPrime_1 = xPrime_1,
-      yPrime_1 = yPrime_1,
-      xPrime_2 = xPrime_2,
-      yPrime_2 = yPrime_2
-    )
-  return(ret)
-}
 
 
 tan_to_sin_cos <- function(tan_value) {
@@ -493,18 +505,141 @@ get_rotation_of_twoPoints <- function(x1, y1, x2, y2) {
 
 #' Extract xy Coordinate of points from a grid grob.
 #'
+#' Warnings: the curveGrob instance is not support, it will cause the problue
+#'
 #' @param grob The grob of the grid package.
+#' @param closed Whether the grob is closed, default is T
 #'
 #' @return a 2xn matrix, where first row is the x axis and second row is the y axis.
 #' @export
 #'
 #' @examples
-#' extract_xyCoordinate_points(circleGrob)
-extract_xyCoordinate_points <- function(grob) {
-  coords <- grobCoords(x = grob, closed = T)
-  a <- coords[[1]]
+#' extract_xyCoordinate_points(circleGrob, closed = F)
+extract_xyCoordinate_points <- function(grob, closed = T) {
+  coords <- grobCoords(x = grob, closed = closed)
+
+  if (isa(coords, what = 'GridGrobCoords')) {
+    a <- coords[[1]]
+  } else if (isa(coords, what = 'GridGTreeCoords')) {
+    a <- coords[[1]][[1]]
+  } else {
+    stop("A new situations happend, please contact the developers.")
+  }
+
   ret <- matrix(data = c(a$x, a$y),
                 nrow = 2,
                 byrow = T)
   return(ret)
 }
+
+
+#' Soomth out the left and right sides of the quadrangle.
+#'
+#' @param df the data.frame or matrix of the x y points, see details
+#' @param n_pointToSmoothOut number of points to used to smooth out
+#' @param n_step_bezier number of steps of the bezier
+#'
+#' @details
+#' the `df` parameters: first row is the top side line x, second row is the top side line y.
+#' The third row is the bottom line x and the fourth row is the bottom line y.
+#'
+#' @return a list with components x and y
+#' @export
+#'
+#' @examples
+#' grid.newpage()
+#' xx <- seq.int(from = 1, to = 4, by = 0.2)
+#' df <- rbind(xx,1, xx, 2)
+#' # grid.lines(c(xx,rev(xx)), c(df[2,], rev(df[4,])), default.units = 'in')
+#' tt <- soomthOut_twoSidesOf_quadrangle(df,n_pointToSmoothOut = 1 , n_step_bezier = 40)
+#' tt <- soomthOut_twoSidesOf_quadrangle(df,n_pointToSmoothOut = 2 , n_step_bezier = 40)
+#' tt <- soomthOut_twoSidesOf_quadrangle(df,n_pointToSmoothOut = 3 , n_step_bezier = 40)
+#' tt <- soomthOut_twoSidesOf_quadrangle(df,n_pointToSmoothOut = 4 , n_step_bezier = 40)
+#' tt <- soomthOut_twoSidesOf_quadrangle(df,n_pointToSmoothOut = 5 , n_step_bezier = 50)
+#' grid.polygon(tt[1,], tt[2,], default.units = 'in')
+soomthOut_twoSidesOf_quadrangle <-
+  function(df,
+           n_pointToSmoothOut = 2,
+           n_step_bezier = 40) {
+    if (n_pointToSmoothOut == 0) {
+      xx <- c(df[1,], rev(df[3,]))
+      yy <- c(df[2,], rev(df[4,]))
+
+      return(list(x = xx, y = yy))
+    }
+
+    nCols <- ncol(df)
+
+    if (nCols <= (2 * n_pointToSmoothOut + 1)) {
+      dime <- dim(df);
+      stop("The points for soomthing out the quadrangle are two less. the dim of the data.frame is ",dime[1], " ", dime[2])
+    }
+
+    xx <-
+      c(df[1, nCols - n_pointToSmoothOut], df[1, nCols], df[3, nCols], df[3, nCols - n_pointToSmoothOut])
+    yy <-
+      c(df[2, nCols - n_pointToSmoothOut], df[2, nCols], df[4, nCols], df[4, nCols - n_pointToSmoothOut])
+
+    rightSideXY <-
+      fourPoints_to_calculate_bezier(points = create_point(x = xx, y = yy), n_step_bezier = n_step_bezier)
+
+    # grid.lines(x = rightSideXY[1,] , y = rightSideXY[2,], default.units = 'in')
+    xx <-
+      c(df[3, 1 + n_pointToSmoothOut], df[3, 1], df[1, 1], df[1, 1 + n_pointToSmoothOut])
+    yy <-
+      c(df[4, 1 + n_pointToSmoothOut], df[4, 1], df[2, 1], df[2, 1 + n_pointToSmoothOut])
+
+    leftSideXY <-
+      fourPoints_to_calculate_bezier(points = create_point(x = xx, y = yy), n_step_bezier = n_step_bezier)
+
+    # grid.lines(x = leftSideXY[1,] , y = leftSideXY[2,], default.units = 'in')
+
+    keep_indexes <-
+      (1 + n_pointToSmoothOut + 1):(nCols - n_pointToSmoothOut - 1)
+    xx <-
+      c(df[1, keep_indexes],
+        rightSideXY[1,]  ,
+        rev(df[3, keep_indexes]) ,
+        leftSideXY[1,])
+    yy <-
+      c(df[2, keep_indexes], rightSideXY[2,]  , rev(df[4, keep_indexes]) , leftSideXY[2,])
+
+    return(rbind(x = xx, y = yy))
+  }
+
+#' Quick function to calculate the bezier lines.
+#'
+#' @param points the Point instance
+#'
+#' @return the 2xn matrix of xy points
+#' @export
+#'
+#' @importFrom gridBezier nSteps
+#'
+#' @examples
+#' Please see the [[soomthOut_twoSidesOf_quadrangle()]]
+fourPoints_to_calculate_bezier <-
+  function(points, n_step_bezier = 40) {
+    if (!isa(points, what = 'Point')) {
+      stop("The points parameter should be the instance of the Point class.")
+    }
+    # grid.lines(x = points@x,
+    #            y = points@y ,
+    #            default.units = 'in')
+
+
+    bGrob <- BezierGrob(
+      x = points@x,
+      y = points@y,
+      default.units = 'in',
+      open = T,
+      stepFn = nSteps(n_step_bezier)
+    )
+    pts <- BezierPoints(bGrob)
+
+    # grid.lines(x = pts$x,
+    #            y = pts$y ,
+    #            default.units = 'in',
+    # )
+    return(rbind(x = pts$x, y = pts$y))
+  }

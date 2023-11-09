@@ -124,7 +124,7 @@ show_pathway_models <- function(){
   painter$draw_circle_head <- T
   painter$current_lipid_model <- lipid_models[[1]]
 
-  painter$desired_hight <- 0.2
+  painter$desired_height <- 0.2
 
   r <- 3
   df_round <-
@@ -132,7 +132,7 @@ show_pathway_models <- function(){
       from = 0,
       to = 365,
       by = 2,
-      radius = r - painter$desired_hight * 1.2
+      radius = r - painter$desired_height * 1.2
     )
   x <- df_round[1, ] + r + 0.2
   y <- df_round[2, ] + r + 0.2
@@ -282,3 +282,4 @@ show_roundRect_biLayer <- function(){
 
   painter$draw_lipid_along_curve(lineX = coords[1, ],  lineY = coords[2, ],closedPolygon = T)
 }
+

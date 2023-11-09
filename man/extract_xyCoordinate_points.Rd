@@ -4,17 +4,19 @@
 \alias{extract_xyCoordinate_points}
 \title{Extract xy Coordinate of points from a grid grob.}
 \usage{
-extract_xyCoordinate_points(grob)
+extract_xyCoordinate_points(grob, closed = T)
 }
 \arguments{
 \item{grob}{The grob of the grid package.}
+
+\item{closed}{Whether the grob is closed, default is T}
 }
 \value{
 a 2xn matrix, where first row is the x axis and second row is the y axis.
 }
 \description{
-Extract xy Coordinate of points from a grid grob.
+Warnings: the curveGrob instance is not support, it will cause the problue
 }
 \examples{
-extract_xyCoordinate_points(circleGrob)
+extract_xyCoordinate_points(circleGrob, closed = F)
 }

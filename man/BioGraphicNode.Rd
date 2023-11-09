@@ -19,8 +19,13 @@ It can be organized by list in list structure. Some situations are the most suit
 ## ------------------------------------------------
 
 draw_me()
-The print method
-Override here
+The print method Override here
+
+## ------------------------------------------------
+## Method `BioGraphicNode$print`
+## ------------------------------------------------
+
+print()
 }
 \section{Super classes}{
 \code{\link[PathwayIlluminator:ListTreeNode]{PathwayIlluminator::ListTreeNode}} -> \code{\link[PathwayIlluminator:GraphicNode]{PathwayIlluminator::GraphicNode}} -> \code{BioGraphicNode}
@@ -40,14 +45,19 @@ Override here
 
 \item{\code{inner_extension_ratio}}{the ratio of inner boarder, try this parameter by yourself.}
 
-\item{\code{text_position}}{hjust and vjust for textGrob
-Draw if this node does not have children.}
+\item{\code{text_position}}{hjust and vjust for textGrob}
+
+\item{\code{if_draw_label}}{Should draw the label}
+
+\item{\code{uniqueID}}{Different from the label, this is used to distinguish the each node entity, each important node needs to assign the id.
+initialize the function to get the default parameters.}
 }
 \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-BioGraphicNode-new}{\code{BioGraphicNode$new()}}
 \item \href{#method-BioGraphicNode-draw_if_hasChildren}{\code{BioGraphicNode$draw_if_hasChildren()}}
 \item \href{#method-BioGraphicNode-draw_if_noChildren}{\code{BioGraphicNode$draw_if_noChildren()}}
 \item \href{#method-BioGraphicNode-draw_me}{\code{BioGraphicNode$draw_me()}}
@@ -60,11 +70,22 @@ Draw if this node does not have children.}
 <ul>
 <li><span class="pkg-link" data-pkg="PathwayIlluminator" data-topic="ListTreeNode" data-id="addChild"><a href='../../PathwayIlluminator/html/ListTreeNode.html#method-ListTreeNode-addChild'><code>PathwayIlluminator::ListTreeNode$addChild()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="PathwayIlluminator" data-topic="ListTreeNode" data-id="getIDName"><a href='../../PathwayIlluminator/html/ListTreeNode.html#method-ListTreeNode-getIDName'><code>PathwayIlluminator::ListTreeNode$getIDName()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="PathwayIlluminator" data-topic="ListTreeNode" data-id="initialize"><a href='../../PathwayIlluminator/html/ListTreeNode.html#method-ListTreeNode-initialize'><code>PathwayIlluminator::ListTreeNode$initialize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="PathwayIlluminator" data-topic="ListTreeNode" data-id="isLeaf"><a href='../../PathwayIlluminator/html/ListTreeNode.html#method-ListTreeNode-isLeaf'><code>PathwayIlluminator::ListTreeNode$isLeaf()</code></a></span></li>
 </ul>
 </details>
 }}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BioGraphicNode-new"></a>}}
+\if{latex}{\out{\hypertarget{method-BioGraphicNode-new}{}}}
+\subsection{Method \code{new()}}{
+In order to get the default parameters for the class, we initialize properties here.
+
+Draw if this node does not have children.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{BioGraphicNode$new()}\if{html}{\out{</div>}}
+}
+
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BioGraphicNode-draw_if_hasChildren"></a>}}
 \if{latex}{\out{\hypertarget{method-BioGraphicNode-draw_if_hasChildren}{}}}
@@ -117,8 +138,7 @@ Draw myself}
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{draw_me()
-The print method
-Override here
+The print method Override here
 }
 \if{html}{\out{</div>}}
 
@@ -131,6 +151,14 @@ Override here
 \subsection{Method \code{print()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BioGraphicNode$print()}\if{html}{\out{</div>}}
+}
+
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{print()
+}
+\if{html}{\out{</div>}}
+
 }
 
 }

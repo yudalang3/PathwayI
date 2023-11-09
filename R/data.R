@@ -16,3 +16,11 @@
 #'
 #' @source manually created my developers.
 "basic_bioGraphics_templates"
+
+#' Create the DNA double helix templates
+#' 20231103 updated
+#'
+#' @format a list in list structure
+#'
+#' @source manually created my developers.
+"DNA_templates"

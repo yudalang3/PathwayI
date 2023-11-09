@@ -472,8 +472,7 @@ paintArea = NULL) {
     )
   }
 
-  global_pars <- get_global_pars()
-  my_font_size <- global_pars[['fontsize']];
+  my_font_size <- get_global_text_pars()$fontsize;
 
   # draw the coexpression genes
   default_gpar_for_genes <-

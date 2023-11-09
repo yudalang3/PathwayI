@@ -12,7 +12,7 @@ BioGraphicNode <- R6Class(
   inherit = GraphicNode,
   public = list(
     #' @field circle_radius how big the node is.
-    circle_radius = 50,
+    circle_radius = 1,
     #' @field rotation_angle_inRadian the rotation angle in radian, default is 0.
     rotation_angle_inRadian = 0,
     #' @field xyPoints_shape the x y points  of the drawing shape, default is a rectangle
@@ -20,11 +20,23 @@ BioGraphicNode <- R6Class(
     #' @field gpar_shape the gpar for the shape
     gpar_shape = gpar(),
     #' @field gpar_text the gpar for the text
-    gpar_text = gpar(),
+    gpar_text = NULL,
     #' @field inner_extension_ratio the ratio of inner boarder, try this parameter by yourself.
     inner_extension_ratio = 0.15,
     #' @field text_position hjust and vjust for textGrob
     text_position = c(0.5, 0.5),
+    #' @field if_draw_label Should draw the label
+    if_draw_label = T,
+    #' @field uniqueID Different from the label, this is used to distinguish the each node entity, each important node needs to assign the id.
+    uniqueID = NA,
+
+    #' initialize the function to get the default parameters.
+    #' @description
+    #' In order to get the default parameters for the class, we initialize properties here.
+    #'
+    initialize = function() {
+      self$gpar_text = get_global_text_pars()
+    },
 
     #' Draw if this node does not have children.
     #' @param default_unit the unit default is inch.
@@ -47,14 +59,14 @@ BioGraphicNode <- R6Class(
             moveY = y
           )
         polyGrob <- grid.polygon(
-          x = xyPoints[1, ],
-          y = xyPoints[2, ],
+          x = xyPoints[1,],
+          y = xyPoints[2,],
           default.units = default_unit,
           gp = child$gpar_shape
         )
 
-        x_range <- range(xyPoints[1, ])
-        y_range <- range(xyPoints[2, ])
+        x_range <- range(xyPoints[1,])
+        y_range <- range(xyPoints[2,])
         return(c(x_range, y_range))
       })
 
@@ -99,14 +111,15 @@ BioGraphicNode <- R6Class(
           moveY = y
         )
       polyGrob <- grid.polygon(
-        x = xyPoints[1, ],
-        y = xyPoints[2, ],
+        x = xyPoints[1,],
+        y = xyPoints[2,],
         default.units = default_unit,
         gp = self$gpar_shape
       )
 
-      x_range <- range(xyPoints[1, ])
-      y_range <- range(xyPoints[2, ])
+      x_range <- range(xyPoints[1,])
+      y_range <- range(xyPoints[2,])
+
 
       register_global_bioGraphics_nodes_list(self$label, list(grob = polyGrob, x =
                                                                 x, y = y))
@@ -122,12 +135,12 @@ BioGraphicNode <- R6Class(
             moveX = x,
             moveY = y
           )
-        grid.polygon(x = xyPoints[1, ],
-                     y = xyPoints[2, ],
+        grid.polygon(x = xyPoints[1,],
+                     y = xyPoints[2,],
                      default.units = default_unit)
       }
 
-      if (!is.na(self$label)) {
+      if (self$if_draw_label && !is.na(self$label)) {
         x <-
           x_range[1] * (1 - self$text_position[1]) + x_range[2] * self$text_position[1]
         y <-
@@ -140,7 +153,7 @@ BioGraphicNode <- R6Class(
           gp = self$gpar_text,
           hjust = 1 - self$text_position[1],
           vjust = 1 - self$text_position[2],
-          rot = - self$rotation_angle_inRadian / ONE_DEGREE_IN_RADIAN
+          rot = -self$rotation_angle_inRadian / ONE_DEGREE_IN_RADIAN
         )
       }
     },
@@ -148,8 +161,6 @@ BioGraphicNode <- R6Class(
     #' Draw myself
     #'
     #' @param default_unit the coordinate unit, default is 'in'
-    #'
-    #' @export
     #'
     #' @examples
     #' draw_me()
@@ -162,8 +173,9 @@ BioGraphicNode <- R6Class(
       }
     },
 
-    #' The print method
-    #' Override here
+    #' The print method Override here
+    #' @examples
+    #' print()
     print = function() {
       super$print()
 
@@ -193,7 +205,7 @@ create_round_node <- function(inner_extension_ratio = 0) {
       from = 0,
       by = 2,
       to = 360,
-      radius = 1
+      radius = 0.5
     )
 
   a$inner_extension_ratio <- inner_extension_ratio
@@ -223,7 +235,7 @@ create_oval_node <-
         from = 0,
         by = 2,
         to = 360,
-        radius = 1
+        radius = 0.5
       )
     ## Users can adjust the height ratio
     xy <-
@@ -255,6 +267,40 @@ create_rectangular_node <-
     ## Users can adjust the height ratio
     xy <-
       do_scale_affine(xy, scaleWidth = scaleWidth, scaleHeight = scaleHeight)
+    a$xyPoints_shape <- xy
+    a$inner_extension_ratio <- inner_extension_ratio
+    return(a)
+  }
+
+#' Create the round rectangular bio graphics node drawer.
+#'
+#' @param width the width with inchs
+#' @param height the height with inchs
+#' @param r_ratio the ratio of the round corner
+#' @param inner_extension_ratio try this argument yourself
+#'
+#' @return the instance
+#' @export
+#'
+#' @examples
+#' create_round_rectangular_node()
+create_round_rectangular_node <-
+  function(width = 1,
+           height = 1,
+           r_ratio = 0.2,
+           inner_extension_ratio = 0) {
+    grob <-
+      roundrectGrob(
+        x = 0,
+        y = 0,
+        width = width,
+        height = height,
+        default.units = 'in',
+        r = unit(r_ratio, 'snpc')
+      )
+
+    xy <- extract_xyCoordinate_points(grob)
+    a <- BioGraphicNode$new()
     a$xyPoints_shape <- xy
     a$inner_extension_ratio <- inner_extension_ratio
     return(a)

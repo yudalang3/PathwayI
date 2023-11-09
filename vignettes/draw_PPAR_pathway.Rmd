@@ -1,0 +1,624 @@
+---
+title: "draw_PPAR_pathway"
+output: rmarkdown::html_vignette
+date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
+vignette: >
+  %\VignetteIndexEntry{draw_PPAR_pathway}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width=8, fig.height=5,
+  fig.align = "center"
+)
+```
+
+So, let us take a journey to draw a figure of the real world knowledge. This time, we choose the PPAR pathway as an example.
+
+```{r setup}
+library(PathwayIlluminator)
+library(grid)
+```
+
+# The drawing process step by step
+
+Overall, we draw the pathway through 1) Cell membrane and nuclear membrane, 2) Node of complex or single protein, 3) DNA string 4) edge of the direction or regulation.
+
+## First, cell membrane and nuclear membrane
+
+```{r}
+grid.newpage()
+
+show_grid_forAssistance()
+
+df_lipidsPoints <-
+  produce_model_coordinate_points(
+    from = -180 ,
+    to = 70,
+    by = 3,
+    radius = 3.5
+  ) |> do_scale_affine(scaleHeight = 0.6) |> do_translate_affine(moveX = 5, moveY = 2)
+
+drawer <-
+  create_lipidBilayer_drawer(lipidModelIndex = 6, draw_circle_head = T)
+drawer$draw_lipid_along_curve(lineX = df_lipidsPoints[1,] , lineY = df_lipidsPoints[2,])
+
+df_nucleus_membrane <-
+  produce_model_coordinate_points(
+    from = 0,
+    to = 360,
+    by = 2,
+    radius = 2
+  ) |> do_scale_affine(scaleHeight = 0.6) |> do_translate_affine(moveX = 5.5, moveY = 1.5)
+
+# drawer <-
+#   create_lipidBilayer_drawer(lipidModelIndex = 4, draw_circle_head = T)
+# drawer$desired_height <- 0.1
+#
+#
+# startPos <- seq(from = 1, by = 6, to = ncol(df_nucleus_membrane) - 10)
+# walk(startPos, .f = function(s){
+#   columns <- s:(s+5);
+#   drawer$draw_lipid_along_curve(lineX = df_nucleus_membrane[1,columns] , lineY = df_nucleus_membrane[2,columns])
+# })
+painter2 <- create_roundRectBilayer_drawer(numberOfIntervals = 10)
+painter2$desired_height <- 0.08
+painter2$draw_along_curve(lineX = df_nucleus_membrane[1,], lineY = df_nucleus_membrane[2,])
+
+```
+
+Note: we use the `show_grid_forAssistance()` function to produce the grid dash lines to determine the location of the staffs.
+
+## Next, DNA string
+
+```{r}
+grid.newpage()
+
+show_grid_forAssistance()
+
+df_lipidsPoints <-
+  produce_model_coordinate_points(
+    from = -180 ,
+    to = 70,
+    by = 3,
+    radius = 3.5
+  ) |> do_scale_affine(scaleHeight = 0.6) |> do_translate_affine(moveX = 5, moveY = 2)
+
+drawer <-
+  create_lipidBilayer_drawer(lipidModelIndex = 6, draw_circle_head = T)
+drawer$draw_lipid_along_curve(lineX = df_lipidsPoints[1,] , lineY = df_lipidsPoints[2,])
+
+df_nucleus_membrane <-
+  produce_model_coordinate_points(
+    from = 0,
+    to = 360,
+    by = 2,
+    radius = 2
+  ) |> do_scale_affine(scaleHeight = 0.6) |> do_translate_affine(moveX = 5.5, moveY = 1.5)
+
+# drawer <-
+#   create_lipidBilayer_drawer(lipidModelIndex = 4, draw_circle_head = T)
+# drawer$desired_height <- 0.1
+#
+#
+# startPos <- seq(from = 1, by = 6, to = ncol(df_nucleus_membrane) - 10)
+# walk(startPos, .f = function(s){
+#   columns <- s:(s+5);
+#   drawer$draw_lipid_along_curve(lineX = df_nucleus_membrane[1,columns] , lineY = df_nucleus_membrane[2,columns])
+# })
+painter2 <- create_roundRectBilayer_drawer(numberOfIntervals = 10)
+painter2$desired_height <- 0.08
+painter2$draw_along_curve(lineX = df_nucleus_membrane[1,], lineY = df_nucleus_membrane[2,])
+
+
+
+drawer_NDA <- create_DNA_drawer(dnaType = 2,numOfRepeats = 3,desired_height = 0.35)
+drawer_NDA$draw_me(3.6,1)
+
+
+transcriptMachine1 <-
+  create_round_rectangular_node(width = 0.5,
+                                height = 0.4,
+                                inner_extension_ratio = 0.2)
+transcriptMachine1$label <- NA
+transcriptMachine1$xAxis_or_radius <- 4.3
+transcriptMachine1$yAxis_or_angle <- 1.45
+transcriptMachine1$circle_radius <- 1
+transcriptMachine1$text_position <- c(0.5, 0.5)
+transcriptMachine1$draw_me()
+
+
+```
+
+## Draw node of complex or single protein
+
+```{r}
+grid.newpage()
+
+show_grid_forAssistance()
+
+df_lipidsPoints <-
+  produce_model_coordinate_points(
+    from = -180 ,
+    to = 70,
+    by = 3,
+    radius = 3.5
+  ) |> do_scale_affine(scaleHeight = 0.6) |> do_translate_affine(moveX = 5, moveY = 2)
+
+drawer <-
+  create_lipidBilayer_drawer(lipidModelIndex = 6, draw_circle_head = T)
+drawer$draw_lipid_along_curve(lineX = df_lipidsPoints[1,] , lineY = df_lipidsPoints[2,])
+
+df_nucleus_membrane <-
+  produce_model_coordinate_points(
+    from = 0,
+    to = 360,
+    by = 2,
+    radius = 2
+  ) |> do_scale_affine(scaleHeight = 0.6) |> do_translate_affine(moveX = 5.5, moveY = 1.5)
+
+# drawer <-
+#   create_lipidBilayer_drawer(lipidModelIndex = 4, draw_circle_head = T)
+# drawer$desired_height <- 0.1
+#
+#
+# startPos <- seq(from = 1, by = 6, to = ncol(df_nucleus_membrane) - 10)
+# walk(startPos, .f = function(s){
+#   columns <- s:(s+5);
+#   drawer$draw_lipid_along_curve(lineX = df_nucleus_membrane[1,columns] , lineY = df_nucleus_membrane[2,columns])
+# })
+painter2 <- create_roundRectBilayer_drawer(numberOfIntervals = 10)
+painter2$desired_height <- 0.08
+painter2$draw_along_curve(lineX = df_nucleus_membrane[1,], lineY = df_nucleus_membrane[2,])
+
+
+
+drawer_NDA <- create_DNA_drawer(dnaType = 2,numOfRepeats = 3,desired_height = 0.35)
+drawer_NDA$draw_me(3.6,1)
+
+
+
+
+Lipoxygenases_receptor <-
+  create_round_rectangular_node(width = 0.4,
+                                height = 0.6,
+                                inner_extension_ratio = 0.2)
+Lipoxygenases_receptor$label <- 'Lipoxygenases'
+Lipoxygenases_receptor$xAxis_or_radius <- 5
+Lipoxygenases_receptor$yAxis_or_angle <- 4
+Lipoxygenases_receptor$circle_radius <- 2
+Lipoxygenases_receptor$text_position <- c(0.5, 1.1)
+Lipoxygenases_receptor$draw_me()
+
+
+
+
+ppar_a_receptor <-
+  create_oval_node(scaleHeight = 0.8)
+ppar_a_receptor$label <- 'PPARa'
+ppar_a_receptor$xAxis_or_radius <- 3.2
+ppar_a_receptor$yAxis_or_angle <- 2.5
+ppar_a_receptor$circle_radius <- 0.7
+ppar_a_receptor$text_position <- c(0.5, 0.5)
+ppar_a_receptor$draw_me()
+
+
+ppar_a_receptor <-
+  create_oval_node(scaleHeight = 0.8)
+ppar_a_receptor$label <- 'PPARa'
+ppar_a_receptor$xAxis_or_radius <- 4.8
+ppar_a_receptor$yAxis_or_angle <- 2
+ppar_a_receptor$circle_radius <- 0.7
+ppar_a_receptor$text_position <- c(0.5, 0.5)
+ppar_a_receptor$draw_me()
+
+rxr_a_receptor <-
+  create_round_rectangular_node(width = 1,
+                                height = 0.8,
+                                inner_extension_ratio = 0.2)
+rxr_a_receptor$label <- 'RXR'
+rxr_a_receptor$xAxis_or_radius <- 5
+rxr_a_receptor$yAxis_or_angle <- 1.8
+rxr_a_receptor$circle_radius <- 0.5
+rxr_a_receptor$text_position <- c(0.5, 0.5)
+rxr_a_receptor$draw_me()
+
+
+ppar_y_receptor <-
+  create_oval_node(scaleHeight = 0.8)
+ppar_y_receptor$label <- 'PPARy'
+ppar_y_receptor$xAxis_or_radius <- 6
+ppar_y_receptor$yAxis_or_angle <- 2
+ppar_y_receptor$circle_radius <- 0.7
+ppar_y_receptor$text_position <- c(0.5, 0.5)
+ppar_y_receptor$draw_me()
+
+rxr_a_receptor <-
+  create_round_rectangular_node(width = 1,
+                                height = 0.8,
+                                inner_extension_ratio = 0.2)
+rxr_a_receptor$label <- 'RXR'
+rxr_a_receptor$xAxis_or_radius <- 6.3
+rxr_a_receptor$yAxis_or_angle <- 1.8
+rxr_a_receptor$circle_radius <- 0.5
+rxr_a_receptor$text_position <- c(0.5, 0.5)
+rxr_a_receptor$draw_me()
+
+
+
+
+transcriptMachine1 <-
+  create_round_rectangular_node(width = 0.5,
+                                height = 0.4,
+                                inner_extension_ratio = 0.2)
+transcriptMachine1$label <- NA
+transcriptMachine1$xAxis_or_radius <- 4.3
+transcriptMachine1$yAxis_or_angle <- 1.45
+transcriptMachine1$circle_radius <- 1
+transcriptMachine1$text_position <- c(0.5, 0.5)
+transcriptMachine1$draw_me()
+
+transcriptMachine2 <-
+  create_round_rectangular_node(width = 0.5,
+                                height = 0.4,
+                                inner_extension_ratio = 0.2)
+transcriptMachine2$label <- NA
+transcriptMachine2$xAxis_or_radius <- 5.9
+transcriptMachine2$yAxis_or_angle <- 1.45
+transcriptMachine2$circle_radius <- 1
+transcriptMachine2$text_position <- c(0.5, 0.5)
+transcriptMachine2$draw_me()
+```
+
+
+## Last step, add the indicators
+
+```{r}
+grid.newpage()
+
+df_lipidsPoints <-
+  produce_model_coordinate_points(
+    from = -180 ,
+    to = 70,
+    by = 3,
+    radius = 3.5
+  ) |> do_scale_affine(scaleHeight = 0.6) |> do_translate_affine(moveX = 5, moveY = 2)
+
+drawer <-
+  create_lipidBilayer_drawer(lipidModelIndex = 6, draw_circle_head = T)
+drawer$draw_lipid_along_curve(lineX = df_lipidsPoints[1,] , lineY = df_lipidsPoints[2,])
+
+df_nucleus_membrane <-
+  produce_model_coordinate_points(
+    from = 0,
+    to = 360,
+    by = 2,
+    radius = 2
+  ) |> do_scale_affine(scaleHeight = 0.6) |> do_translate_affine(moveX = 5.5, moveY = 1.5)
+
+# drawer <-
+#   create_lipidBilayer_drawer(lipidModelIndex = 4, draw_circle_head = T)
+# drawer$desired_height <- 0.1
+#
+#
+# startPos <- seq(from = 1, by = 6, to = ncol(df_nucleus_membrane) - 10)
+# walk(startPos, .f = function(s){
+#   columns <- s:(s+5);
+#   drawer$draw_lipid_along_curve(lineX = df_nucleus_membrane[1,columns] , lineY = df_nucleus_membrane[2,columns])
+# })
+painter2 <- create_roundRectBilayer_drawer(numberOfIntervals = 10)
+painter2$desired_height <- 0.08
+painter2$draw_along_curve(lineX = df_nucleus_membrane[1,], lineY = df_nucleus_membrane[2,])
+
+
+
+drawer_NDA <- create_DNA_drawer(dnaType = 2,numOfRepeats = 3,desired_height = 0.35)
+drawer_NDA$draw_me(3.6,1)
+
+
+
+
+Lipoxygenases_receptor <-
+  create_round_rectangular_node(width = 0.4,
+                                height = 0.6,
+                                inner_extension_ratio = 0.2)
+Lipoxygenases_receptor$label <- 'Lipoxygenases'
+Lipoxygenases_receptor$xAxis_or_radius <- 5
+Lipoxygenases_receptor$yAxis_or_angle <- 4
+Lipoxygenases_receptor$circle_radius <- 2
+Lipoxygenases_receptor$text_position <- c(0.5, 1.1)
+Lipoxygenases_receptor$draw_me()
+
+
+
+
+ppar_a_receptor <-
+  create_oval_node(scaleHeight = 0.8)
+ppar_a_receptor$label <- 'PPARa-1'
+ppar_a_receptor$xAxis_or_radius <- 3.2
+ppar_a_receptor$yAxis_or_angle <- 2.5
+ppar_a_receptor$circle_radius <- 0.7
+ppar_a_receptor$text_position <- c(0.5, 0.5)
+ppar_a_receptor$draw_me()
+
+
+ppar_a_receptor <-
+  create_oval_node(scaleHeight = 0.8)
+ppar_a_receptor$label <- 'PPARa-2'
+ppar_a_receptor$xAxis_or_radius <- 4.8
+ppar_a_receptor$yAxis_or_angle <- 2
+ppar_a_receptor$circle_radius <- 0.7
+ppar_a_receptor$text_position <- c(0.5, 0.5)
+ppar_a_receptor$draw_me()
+
+rxr_a_receptor <-
+  create_round_rectangular_node(width = 1,
+                                height = 0.8,
+                                inner_extension_ratio = 0.2)
+rxr_a_receptor$label <- 'RXR-1'
+rxr_a_receptor$xAxis_or_radius <- 5
+rxr_a_receptor$yAxis_or_angle <- 1.8
+rxr_a_receptor$circle_radius <- 0.5
+rxr_a_receptor$text_position <- c(0.5, 0.5)
+rxr_a_receptor$draw_me()
+
+
+ppar_y_receptor <-
+  create_oval_node(scaleHeight = 0.8)
+ppar_y_receptor$label <- 'PPARy'
+ppar_y_receptor$xAxis_or_radius <- 6
+ppar_y_receptor$yAxis_or_angle <- 2
+ppar_y_receptor$circle_radius <- 0.7
+ppar_y_receptor$text_position <- c(0.5, 0.5)
+ppar_y_receptor$draw_me()
+
+rxr_a_receptor <-
+  create_round_rectangular_node(width = 1,
+                                height = 0.8,
+                                inner_extension_ratio = 0.2)
+rxr_a_receptor$label <- 'RXR-2'
+rxr_a_receptor$xAxis_or_radius <- 6.3
+rxr_a_receptor$yAxis_or_angle <- 1.8
+rxr_a_receptor$circle_radius <- 0.5
+rxr_a_receptor$text_position <- c(0.5, 0.5)
+rxr_a_receptor$draw_me()
+
+
+
+
+transcriptMachine1 <-
+  create_round_rectangular_node(width = 0.5,
+                                height = 0.4,
+                                inner_extension_ratio = 0.2)
+transcriptMachine1$label <- NA
+transcriptMachine1$xAxis_or_radius <- 4.3
+transcriptMachine1$yAxis_or_angle <- 1.45
+transcriptMachine1$circle_radius <- 1
+transcriptMachine1$text_position <- c(0.5, 0.5)
+transcriptMachine1$draw_me()
+
+transcriptMachine2 <-
+  create_round_rectangular_node(width = 0.5,
+                                height = 0.4,
+                                inner_extension_ratio = 0.2)
+transcriptMachine2$label <- NA
+transcriptMachine2$xAxis_or_radius <- 5.9
+transcriptMachine2$yAxis_or_angle <- 1.45
+transcriptMachine2$circle_radius <- 1
+transcriptMachine2$text_position <- c(0.5, 0.5)
+transcriptMachine2$draw_me()
+
+indicator_drawer <- create_dege_drawer(curvature = -1)
+indicator_drawer$draw_me(4.6,1.45,5,1.45)
+indicator_drawer$draw_me(6.2,1.45,6.6,1.45)
+
+indicator_drawer$curvature <- 0
+indicator_drawer$draw_me(2.5,3.1,2.9,2.7)
+indicator_drawer$draw_me(3.5, 2.3, 4.3, 2)
+```
+
+
+
+# How about the ggplot2 style function called approach
+
+
+First, let us modeling the elements in the figure. A picture consists of 1. cell membrane, 2. cell nucleus, 3. nodes and 4. edges.
+
+2.1 nuclear envelope
+2.2 nuclear DNA
+
+3.1 assembly
+3.2 complex
+3.3 single protein
+
+4.1 fix node to node indicator
+4.2 free location indicator
+
+The relationship could be expressed by the R data structure.
+```{r}
+model_the_pathway <-
+  list(
+    cellMembrane = 'cell membrane',
+    cellNucleus = list(nuclearEnvelope = 'nuclear envelope', nuclearDNA = 'nuclear DNA'),
+    nodes = list(assembly = 'assembly node', complex = 'complex node', singleProtein = 'single protein'),
+    edges = list(fix = 'fix node to node indicator', free = 'free location indicator')
+  )
+
+lobstr::tree(model_the_pathway)
+```
+
+
+
+So, the drawing API (Application Programming interface) would be :
+
+```{r eval=FALSE}
+pathIllustrator <- membrane(shape = 'ellipse', x = 1, y = 1, w = 3, h = 2) + 
+  nuclearEnvelop(x = 2, y = 2, w = 1, h = 1) +  
+  nuclearDNA(x = 2.5,y = 2.5, desired_height = 0.3, numOfRepeats = 2) + 
+  nodes(data = df1) + 
+  edges(fixIndi = df2, freeIndi = df3)
+```
+
+And plus the professional graphic elements, we can add some `ggplot2` style features, like `title`.
+
+```{r eval=FALSE}
+pathIllustrator <- membrane(shape = 'ellipse', x = 1, y = 1, w = 3, h = 2) + 
+  nuclearEnvelop(x = 2, y = 2, w = 1, h = 1) +  
+  nuclearDNA(x = 2.5,y = 2.5, h = 0.3, rep = 2)) + 
+  nodes(data = df1) + 
+  edges(fixIndi = df2, freeIndi = df3) +
+  title( "A showcase of the path illustrator", just = 'top')
+```
+
+Also, you may need the scale function, to scale the x,y,width and height into the destination size.
+
+## Let us step by step to create the figure 
+
+### The menbrane
+
+```{r}
+pathIllustrator <- membrane(shape = 'ellipse', x = 1, y = 1, w = 7, h = 4.2)
+pathIllustrator
+```
+
+### The nuclearEnvelop
+
+```{r}
+pathIllustrator <- nuclearEnvelop(x = 5.5, y = 1.5, w = 4, h = 2.4)
+pathIllustrator
+```
+
+### Combinate the two cell compounents
+
+```{r}
+pathIllustrator <- membrane(shape = 'ellipse', x = 1, y = 0.2, w = 7, h = 4.2) + 
+  nuclearEnvelop(x = 3.3, y = 0.5,  w = 4, h = 2.4)
+pathIllustrator
+```
+
+### and the DNA string
+
+```{r}
+pathIllustrator <- membrane(shape = 'ellipse', x = 1, y = 0.2, w = 7, h = 4.2) + 
+  nuclearEnvelop(x = 3.3, y = 0.5,  w = 4, h = 2.4) +
+  nuclearDNA(x = 3.5, y = 1.5,numOfRepeats = 3)
+pathIllustrator
+```
+
+
+### add the node information
+
+```{r}
+df <- rbind(
+  list('Lipoxygenases',5,4,0.4,0.6,0.2,c(0.5, 1.1), 'roundRect'),
+  list(label='PPARa-1',x=3.2,y=2.5,w=1,h=0.8,ratio=0,tp=c(0.5, 0.5),'ellipse'),
+  list(label='PPARa-2',x=4.8,y=2,w=0.7,h=0.8*0.7,ratio=0,tp=c(0.5, 0.5),'ellipse'),
+  list(label='RXR-1',x=5,y=1.8,w=0.5,h=0.4,ratio=0.2,tp=c(0.5, 0.5),'roundRect'),
+  list(label='PPARy',x=6,y=2,w=0.7,h=0.8*0.7,ratio=0,tp=c(0.5, 0.5),'ellipse'),
+  list(label='RXR-2',x=6.3,y=1.8,w=0.5,h=0.4,ratio=0.2,tp=c(0.5, 0.5),'roundRect'),
+  list(label=NA,x=4.3,y=1.45,w=0.5,h=0.4,ratio=0.2,tp=c(0.5, 0.5),'roundRect'),
+  list(label=NA,x=5.9,y=1.45,w=0.5,h=0.4,ratio=0.2,tp=c(0.5, 0.5),'roundRect')
+)
+colnames(df) <- c("label","x","y","width","height","inner_extension_ratio","text_position", "shape")
+
+nodes(data = df)
+```
+
+### add the free arrow
+
+```{r}
+df <- rbind(
+  c(4.6,1.45,5,1.45,-1,0.1),
+  c(6.2,1.45,6.6,1.45,-1,0.1),
+  c(2.5,3.1,2.9,2.7,-1,0.1),
+  c(3.5, 2.3, 4.3, 2,-1,0.1)
+)
+
+colnames(df) <- c('x1','y1','x2','y2','curvature','arrowLen')
+
+edges(free_indicator_df = df)
+
+## let us try the pScaleCooordinate
+edges(free_indicator_df = df) + pScaleCoord(destWidth = 1, destHeight = 1)
+```
+
+
+## Take all these together as the a whole figure
+
+Now, we could draw a figure like a general `PPAR` pathway with the `ggplot2` style API.
+
+```{r}
+df_node <- rbind(
+  list('Lipoxygenases',5,4,0.4,0.6,0.2,c(0.5, 1.1), 'roundRect'),
+  list(label='PPARa-1',x=3.2,y=2.5,w=1,h=0.8,ratio=0,tp=c(0.5, 0.5),'ellipse'),
+  list(label='PPARa-2',x=4.8,y=2,w=0.7,h=0.8*0.7,ratio=0,tp=c(0.5, 0.5),'ellipse'),
+  list(label='RXR-1',x=5,y=1.8,w=0.5,h=0.4,ratio=0.2,tp=c(0.5, 0.5),'roundRect'),
+  list(label='PPARy',x=6,y=2,w=0.7,h=0.8*0.7,ratio=0,tp=c(0.5, 0.5),'ellipse'),
+  list(label='RXR-2',x=6.3,y=1.8,w=0.5,h=0.4,ratio=0.2,tp=c(0.5, 0.5),'roundRect'),
+  list(label=NA,x=4.3,y=1.45,w=0.5,h=0.4,ratio=0.2,tp=c(0.5, 0.5),'roundRect'),
+  list(label=NA,x=5.9,y=1.45,w=0.5,h=0.4,ratio=0.2,tp=c(0.5, 0.5),'roundRect')
+)
+colnames(df_node) <- c("label","x","y","width","height","inner_extension_ratio","text_position", "shape")
+
+df_freeIndicator <- rbind(
+  c(4.6,1.45,5,1.45,-1,0.1),
+  c(6.2,1.45,6.6,1.45,-1,0.1),
+  c(2.5,3.1,2.9,2.7,-1,0.1),
+  c(3.5, 2.3, 4.3, 2,-1,0.1)
+)
+
+colnames(df_freeIndicator) <- c('x1','y1','x2','y2','curvature','arrowLen')
+
+pathIllustrator <- membrane(shape = 'ellipse', x = 1, y = 0.2, w = 7, h = 4.2) + 
+  nuclearEnvelop(x = 3.3, y = 0.5,  w = 4, h = 2.4) +
+  nuclearDNA(x = 3.5, y = 1.5,numOfRepeats = 3) +
+  nodes(data = df_node) +
+  edges(free_indicator_df = df_freeIndicator) 
+
+pathIllustrator
+```
+
+
+**Not beautifull? we slightly modify the parameters.**
+
+```{r}
+df_node <- rbind(
+  list('Lipoxygenases',5,4.1,0.4,0.6,0.2,c(0.5, 1.1), 'roundRect'),
+  list(label='PPARa-1',x=3,y=2.5,w=1,h=0.8,ratio=0,tp=c(0.5, 0.5),'ellipse'),
+  list(label='PPARa-2',x=4.4,y=2.2,w=0.7,h=0.8*0.7,ratio=0,tp=c(0.5, 0.5),'ellipse'),
+  list(label='RXR-1',x=4.4,y=1.8,w=0.5,h=0.4,ratio=0.2,tp=c(0.5, 0.5),'roundRect'),
+  list(label='PPARy',x=5.5,y=2,w=0.7,h=0.8*0.7,ratio=0,tp=c(0.5, 0.5),'ellipse'),
+  list(label='RXR-2',x=5.9,y=1.8,w=0.5,h=0.4,ratio=0.2,tp=c(0.5, 0.5),'roundRect'),
+  list(label=NA,x=4.1,y=1.45,w=0.5,h=0.4,ratio=0.2,tp=c(0.5, 0.5),'roundRect'),
+  list(label=NA,x=5.7,y=1.45,w=0.5,h=0.4,ratio=0.2,tp=c(0.5, 0.5),'roundRect')
+)
+colnames(df_node) <- c("label","x","y","width","height","inner_extension_ratio","text_position", "shape")
+
+df_freeIndicator <- rbind(
+  c(4.6,1.6,5,1.6,1,0.1),
+  c(6.2,1.6,6.6,1.6,0,0.1),
+  c(2.1, 3.7, 2.9, 3.2,0,0.1),
+  c(3.8, 2.3, 4.3, 2,1,0.1)
+)
+
+colnames(df_freeIndicator) <- c('x1','y1','x2','y2','curvature','arrowLen')
+
+## You can set the global text font graphics prameters here
+set_global_text_pars('fontsize',  9)
+
+pathIllustrator <- membrane(shape = 'roundRect', x = 1, y = 0.2, w = 7, h = 4.2) + 
+  nuclearEnvelop(x = 3.3, y = 0.5,  w = 4, h = 2.4) +
+  nuclearDNA(x = 3.5, y = 1.3,numOfRepeats = 3) +
+  nodes(data = df_node) +
+  edges(free_indicator_df = df_freeIndicator)  + 
+  pTitle(name = "An approximate way to visulize the PPAR pathway.", gpar(fontface = 'bold'))
+
+pathIllustrator
+```
+

@@ -253,6 +253,9 @@ draw_bezier_fourPoints <-
 draw_2xn_matrix_points <- function(... , default.units = 'in') {
   all_objs <- list(...)
   walk(all_objs, function(x) {
+    if(dim(x)[1] > 2){
+      message("Your input points data, may need to transpose. The nrow is greater than 2.")
+    }
     grid.lines(x[1,], x[2,], default.units = default.units)
   })
 }
