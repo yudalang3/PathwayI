@@ -82,6 +82,23 @@ Here we only record the major features.
 * Version 0.0.0.1036 完成使用`+`为基础的 ggplot2 style API调用方式
 * Version 0.0.0.1037 略微调整DNA字符串的y坐标，使之和JAVA GUI版本效果一致
 * Version 0.0.0.1038 修复JAVA GUI界面拖动“滑块现象”
+* Version 0.0.0.1039 不同的蛋白质有不同的形状，提出并完成了 graphic node maker模块，下面暂时简称为GNM
+* Version 0.0.0.1040 在Skeleton Maker中新增 customized shape 图形界面的说明与按钮
+* Version 0.0.0.1041 完成SM与GNM的结合使用功能
+* Version 0.0.0.1042 解决GNM输出结果的一个重要问题，二维的像素点在导出的时候不能直接用传统的两重for循环直接导出
+* Version 0.0.0.1043 修复选中格子无法完全填充格子的 视觉问题，填充的格子与网格线包起来的区域不吻合
+* Version 0.0.0.1044 意识到下边与个数的问题，修复中点附近的绘制误差
+* Version 0.0.0.1045 GUI界面软件 规范一些命名，例如早期最早模块叫做 pointPickPanel，现在要改为SkeletonMakerPanel
+* Version 0.0.0.1046 GUI界面软件 将icon重新归类，分装到images目录下，并用由专门处理加载的类来加载
+* Version 0.0.0.1047 GUI界面软件 完成新增绘制类别Custom的拖拽操作，该操作需要借助于仿射变换。这与传统的一些Shape处理方式不同。
+* Version 0.0.0.1048 GUI界面软件 ClearAll 按钮修复bug
+* Version 0.0.0.1049 GUI界面软件 将DrawingPanelSkeletonMaker中的所有鼠标事件合并，这样处理起来比较集中
+* Version 0.0.0.1050 GUI界面软件 完成上下左右四个方向 pNodesOval 这个图形元件的移动
+* Version 0.0.0.1051 GUI界面软件 又完成了 pMembrane 和 pNucleus 中的移动功能，现在暂时先实现四个方向的移动功能。设计思路是：矩形一般不需要后续的移动来调整，而在绘制的时候就能确定位置；四个corner的移动功能暂时先不实现，因为它可被替代。
+* Version 0.0.0.1052 使用新的+符号连接的API来重新绘制`WNT信号通路图`。现在定义基于`+`连接的API为，plusAPI。
+* Version 0.0.0.1053 GUI界面软件 重构pNodes界面，将width和height重新组织成为一个。
+* Version 0.0.0.1054 GUI界面软件 新增keyType的时间处理类，支持 键盘区域1,2,3,4四个按键的事件处理方式。用户可以直接用键盘来操作形状大小。
+* Version 0.0.0.1055 GUI界面软件 将pNode颜色设置透明度，方便根据已有的形状进行临摹
 
 ## More information:
 
