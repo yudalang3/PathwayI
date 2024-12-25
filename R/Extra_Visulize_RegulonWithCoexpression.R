@@ -1,3 +1,8 @@
+## 类的说明：这个相当于是利用 PathwayIlluminator包的一些核心组件来绘制一个定制的图
+## 而这个图的功能是绘制 TF target genes 和 coexpression gene三者的关系
+## 这其实相当于是一个核心组件之外的一些拓展功能。
+##
+
 getBottomXYList_fromBezier <- function(ol, default_unit) {
   x = c(
     ol$x_coeNodes_leftMost,
@@ -277,14 +282,11 @@ display_TF_targets_coexpress <- function(data = list(
   TF = "TF1",
   targets = paste0("g", c(4, 1, 9, 8, 3, 2, 6, 7, 5)),
   coexpression = c(paste0("g", 1:7), paste0("k", 1:3))
-),
-buttomStyleBezier = F,
-paintArea = NULL) {
+), buttomStyleBezier = F, paintArea = NULL
+) {
   default_unit = 'in'
   last_index_of_coexpresion_belongTo_targes <-
     length(intersect(data$coexpression, data$targets))
-
-
 
   if (is.null(paintArea)) {
     dim_of_device <- par("din")

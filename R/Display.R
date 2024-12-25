@@ -193,17 +193,24 @@ show_pathway_models <- function(){
 
 #' Display a basic surface model.
 #'
+#' @param painter the lipid bilayer drawer
+#' @param yHigh the high y location
+#' @param yLow the low y location
+#' @param xStart the start location of x
+#' @param xEnd the end location of y
+#'
 #' @export
 #'
 #' @examples
 #' show_surface_models()
-show_surface_models <- function(){
+show_surface_models <- function(painter = NULL, yHigh = 3.6, yLow = 3, xStart = 1,xEnd = 4){
 
-  painter <- create_lipidBilayer_drawer(draw_circle_head = T)
-  painter$lipid_head_par <- gpar(fill = 'lightblue', col = 'blue4')
+  if (is.null(painter)) {
+    painter <- create_lipidBilayer_drawer(draw_circle_head = T)
+  }
 
-  yStartLocations <- seq.int(from = 3.6, to = 3, by = -0.05)
-  xPaintingValue <- seq.int(from = 1, to = 4, by = 0.12)
+  yStartLocations <- seq.int(from = yHigh, to = yLow, by = -0.05)
+  xPaintingValue <- seq.int(from = xStart, to = xEnd, by = 0.12)
 
   grid.newpage()
 

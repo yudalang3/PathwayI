@@ -12,7 +12,8 @@ PhospholipidBilayerDrawer <- R6Class(
     #' @field current_lipid_model The model of the lipid
     current_lipid_model = NULL,
     #' @field lipid_head_par The graphics par of the header
-    lipid_head_par = gpar(fill = 'lightblue', col = 'grey30'),
+    lipid_head_par = gpar(fill = NA, col = 'grey30'),
+    # lipid_head_par = gpar(fill = 'lightblue', col = 'grey30'),
     #' @field lipid_line_par The graphics par of the line
     lipid_line_par = gpar(),
     #' @field desired_height The height in inch's
@@ -303,7 +304,8 @@ RoundRectangularBiLayerDrawer <- R6Class(
     #' @field percentageOfRectangle The percentage of the round rectangle, greater 0 and less than 1. Default is 0.7
     percentageOfRectangle = 0.7,
     #' @field roundRectGpar The graphics par of the round rectangle
-    roundRectGpar = gpar(fill = 'purple1' , col = NA),
+    roundRectGpar = gpar(fill = NA),
+    # roundRectGpar = gpar(fill = 'purple1' , col = NA),
     #' @field desired_height The height in inch's
     desired_height = 0.2,
     #' @field painting_parameters store for the parameters for painting. (for more complex functions it can be used)
@@ -438,13 +440,20 @@ DNA_DoubleHelixDrawer <- R6Class(
     numOfRepeats = 8,
     #' @field listOfRibbonGpars The graphics par of the round rectangle
     listOfRibbonGpars = list(
-      leftTop = gpar(fill = '#0055D4' , col = NA),
-      leftBottom = gpar(fill = '#AA0000' , col = NA),
-      rightTop = gpar(fill = '#003380' , col = NA),
-      rightBottom = gpar(fill = '#FF2A2A' , col = NA)
+      leftTop = gpar(fill = NA , col = 'black'),
+      leftBottom = gpar(fill = NA , col = 'black'),
+      rightTop = gpar(fill = NA , col = 'black'),
+      rightBottom = gpar(fill = NA , col = 'black')
     ),
+    # listOfRibbonGpars = list(
+    #   leftTop = gpar(fill = '#0055D4' , col = NA),
+    #   leftBottom = gpar(fill = '#AA0000' , col = NA),
+    #   rightTop = gpar(fill = '#003380' , col = NA),
+    #   rightBottom = gpar(fill = '#FF2A2A' , col = NA)
+    # ),
     #' @field listOfHydrogenBondColors The colors of the hydrogen bonds, the number should be 1,2,4,8
-    listOfHydrogenBondColors = c('#42210B', '#F7931E', '#9E005D', '#2E3192'),
+    listOfHydrogenBondColors = c(NA, NA, NA, NA),
+    # listOfHydrogenBondColors = c('#42210B', '#F7931E', '#9E005D', '#2E3192'),
 
     #' @field dna_template_instance The DNA template instance to paint.
     #' It includes the graphics points of the HydrogenBbond
@@ -490,14 +499,22 @@ DNA_DoubleHelixDrawer <- R6Class(
 
         colors <- self$listOfHydrogenBondColors
         colors <- rep(colors, 16 / length(colors))
+
+        if (is.na(colors[1])) {
+          colo_of_board <- 'black'
+        }else {
+          colo_of_board <- NA
+        }
+
         walk2(
           hydrogenBbonds,
           colors,
           ~ grid.polygon(
-            x = .x[1,] + additional_x,
-            y = .x[2,],
+            x = .x[1, ] + additional_x,
+            y = .x[2, ],
             default.units = 'in',
-            gp = gpar(fill = .y , col = NA)
+            gp = gpar(fill = .y , col = colo_of_board)
+
           )
         )
 

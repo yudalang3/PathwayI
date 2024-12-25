@@ -12,6 +12,10 @@ a list of the needed information
 \description{
 The record will increase by the [\code{\link[=register_global_bioGraphics_nodes_list]{register_global_bioGraphics_nodes_list()}}] function.
 }
+\details{
+The returned list is consists of the elements, which has the property of \code{width} and \code{height}, as well as a \code{grob}.
+The \code{width} and \code{height} are the center of the \code{grob}.
+}
 \examples{
 get_global_bioGraphics_nodes_list() |> names()
 }

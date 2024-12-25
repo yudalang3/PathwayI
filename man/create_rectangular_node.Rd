@@ -23,6 +23,10 @@ the instance
 \description{
 Create the rectangular bio graphics node drawer.
 }
+\details{
+Note: this is the scaler of width height, also the final obtained height and width
+Because the template's width and height both are the 1.
+}
 \examples{
 create_rectangular_node()
 }

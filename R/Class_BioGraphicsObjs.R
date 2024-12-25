@@ -70,6 +70,26 @@ BioGraphicNode <- R6Class(
         return(c(x_range, y_range))
       })
 
+      # browser()
+      xyPoints <-
+        do_scale_rotate_translate_affineTransfor(
+          self$xyPoints_shape,
+          scaleWidth = scaler,
+          scaleHeight = scaler,
+          theta = self$rotation_angle_inRadian,
+          moveX = x,
+          moveY = y
+        )
+      # polygonGrob
+      polyGrob <- polygonGrob(
+        x = xyPoints[1,],
+        y = xyPoints[2,],
+        default.units = default_unit,
+        gp = self$gpar_shape
+      )
+      register_global_bioGraphics_nodes_list(self$label, list(grob = polyGrob, x =
+                                                                x, y = y))
+
       df_range <- do.call(rbind, rangeList)
       xMin <- min(df_range[, 1])
       yMin <- min(df_range[, 3])
@@ -80,15 +100,18 @@ BioGraphicNode <- R6Class(
         xMin * (1 - self$text_position[1]) + xMax * self$text_position[1]
       y <-
         yMin * (1 - self$text_position[2]) + yMax * self$text_position[2]
-      grid.text(
-        x = x,
-        y = y,
-        label = self$label,
-        default.units = default_unit,
-        gp = self$gpar_text,
-        hjust = 1 - self$text_position[1],
-        vjust = 1 - self$text_position[2]
-      )
+
+      if (self$if_draw_label && !is.na(self$label)) {
+        grid.text(
+          x = x,
+          y = y,
+          label = self$label,
+          default.units = default_unit,
+          gp = self$gpar_text,
+          hjust = 1 - self$text_position[1],
+          vjust = 1 - self$text_position[2]
+        )
+      }
     },
 
     #' Draw if this node does have children.
@@ -178,9 +201,14 @@ BioGraphicNode <- R6Class(
     #' print()
     print = function() {
       super$print()
-
       cat('\n')
-      cat("The dim of the shape is: " , dim(self$xyPoints_shape) , '\n')
+
+      num_of_children <- self$children |> length()
+      if (num_of_children == 0) {
+        cat("The number dim of the shape is: " , dim(self$xyPoints_shape) , '\n')
+      }else{
+        cat("The number of children are ", num_of_children, " ")
+      }
     }
 
   )
@@ -252,6 +280,11 @@ create_oval_node <-
 #' @param scaleWidth scaler for width
 #' @param scaleHeight scaler for height
 #'
+#' @details
+#' Note: this is the scaler of width height, also the final obtained height and width
+#' Because the template's width and height both are the 1.
+#'
+#'
 #' @return the instance
 #' @export
 #'
@@ -264,7 +297,7 @@ create_rectangular_node <-
     a <- BioGraphicNode$new()
 
     xy <- a$xyPoints_shape
-    ## Users can adjust the height ratio
+
     xy <-
       do_scale_affine(xy, scaleWidth = scaleWidth, scaleHeight = scaleHeight)
     a$xyPoints_shape <- xy
@@ -278,6 +311,11 @@ create_rectangular_node <-
 #' @param height the height with inchs
 #' @param r_ratio the ratio of the round corner
 #' @param inner_extension_ratio try this argument yourself
+#'
+#' @details
+#' Why the parameter does not have the scale*prefix ? Because it is produced not through
+#' a template.
+#'
 #'
 #' @return the instance
 #' @export
@@ -310,6 +348,11 @@ create_round_rectangular_node <-
 #'
 #' @param xyPoints_shape the 2xn matrix, where first line is x, next line is y
 #' @param inner_extension_ratio try this argument yourself
+#' @param scaleWidth the scaler of the width
+#' @param scaleHeight the scaler of the height
+#'
+#' @details
+#' Note: this is the scaler of width and height, not the final obtained height and width
 #'
 #' @return the instance
 #' @export
@@ -317,10 +360,14 @@ create_round_rectangular_node <-
 #' @examples
 #' create_freeShape_node(xyPoints_shape = rbind(c(1,2,3), c(2,3,4)))
 create_freeShape_node <-
-  function(inner_extension_ratio = 0, xyPoints_shape) {
+  function(inner_extension_ratio = 0,
+           xyPoints_shape,
+           scaleWidth = 1,
+           scaleHeight = 1) {
     a <- BioGraphicNode$new()
 
-    xy <- xyPoints_shape
+    xy <-
+      do_scale_affine(xyPoints_shape, scaleWidth = scaleWidth, scaleHeight = scaleHeight)
     a$xyPoints_shape <- xy
     a$inner_extension_ratio <- inner_extension_ratio
     return(a)
@@ -333,28 +380,58 @@ create_freeShape_node <-
 #' use `basic_bioGraphics_templates |> names()` to see the supported name.
 #'
 #' @param name the name of the supported free shape.
+#' @param expectWidth the user expected width, recommendation is in 'inch', default 1
+#' @param expectHeight the user expected height recommendation is in 'inch'. set it as `NA` for scaling by one para. default is NA.
+#'
+#' @details
+#' Note: this is NOT the scaler of width height, it is the final obtained height and width
+#'
+#' If you want to scale according to one length, set the `expectHeight` as NA, default is NA.
 #'
 #' @return A BioGraphicNode instance.
 #' @export
 #'
 #' @examples
 #' create_selfContained_simple_bioGraphicsNode('LRP_1')
-create_selfContained_simple_bioGraphicsNode <- function(name) {
-  points <- basic_bioGraphics_templates[[name]]$points
+create_selfContained_simple_bioGraphicsNode <-
+  function(name,
+           expectWidth = 1,
+           expectHeight = NA_real_) {
 
-  if (is.list(points)) {
-    children <- lapply(points, function(x) {
-      create_freeShape_node(xyPoints_shape = x)
-    })
-
-    parent <- create_rectangular_node()
-    for (node in children) {
-      parent$addChild(node)
+    if (is.null(basic_bioGraphics_templates[[name]])) {
+      stop(name , " is not exist in this package. Plase see the documentation.")
     }
-    ret <- parent
-  } else {
-    ret <- create_freeShape_node(xyPoints_shape = points)
-  }
+    templ <- basic_bioGraphics_templates[[name]]
+    tempHeight <- templ$height
+    tempWidth <- templ$width
 
-  return(ret)
-}
+    points <- templ$points
+    scaleWidth <- expectWidth / tempWidth
+    if (is.na(expectHeight)) {
+      scaleHeight <- scaleWidth
+      expectHeight <- scaleHeight * tempHeight
+    }else {
+      scaleHeight <- expectHeight / tempHeight
+    }
+
+    if (is.list(points)) {
+      children <- lapply(points, function(x) {
+        xy <-
+          do_scale_affine(x, scaleWidth = scaleWidth, scaleHeight = scaleHeight)
+        create_freeShape_node(xyPoints_shape = xy)
+      })
+
+      parent <-
+        create_rectangular_node(scaleWidth = expectWidth, scaleHeight = expectHeight)
+      for (node in children) {
+        parent$addChild(node)
+      }
+      ret <- parent
+    } else {
+      xy <-
+        do_scale_affine(points, scaleWidth = scaleWidth, scaleHeight = scaleHeight)
+      ret <- create_freeShape_node(xyPoints_shape = xy)
+    }
+
+    return(ret)
+  }

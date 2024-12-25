@@ -99,6 +99,17 @@ Here we only record the major features.
 * Version 0.0.0.1053 GUI界面软件 重构pNodes界面，将width和height重新组织成为一个。
 * Version 0.0.0.1054 GUI界面软件 新增keyType的时间处理类，支持 键盘区域1,2,3,4四个按键的事件处理方式。用户可以直接用键盘来操作形状大小。
 * Version 0.0.0.1055 GUI界面软件 将pNode颜色设置透明度，方便根据已有的形状进行临摹
+* Version 0.0.0.1056 GUI界面软件 将keyType处理的四个按键设置为 W,A,S,D；这样的话用户辨识度高一些。
+* Version 0.0.0.1057 更新 create_round_rectangular_node()函数的注释，新增详细width和height命名的原因
+* Version 0.0.0.1058 对两个函数create_freeShape_node()和create_selfContained_simple_bioGraphicsNode()新增scaleHeight和scaleWidth参数，使用户可以直接调节长和宽。对于自由的形状而言，这里可以设置高度为NA，这样就可以仅根据一个值来拉伸。
+新增类`Class_NodeMaker`，里面的`make_complex_fromNodes()`函数可以很方便的制作复合物。详见视频教程。
+* Version 0.0.0.1059 对于membrane, nuclearEnvelop 和 nuclearDNA，API支持多个绘制。也就是说当用户使用`+`号链接多个`menbrane`的时候会所有都绘制
+* Version 0.0.0.1060 根据R中数据结构的特点，将这些需要绘制信息均表示为 `list in list`的结构方式。
+* Version 0.0.0.1061 更改一些Class的命名例如`Class_API`更改为意义更加明确的`Class_PathwayAPI`。
+* Version 0.0.0.1062 membrane函数`shape`参数新增`points`选项，用户可以直接输入自己想要的形状，例如抛物线。
+* Version 0.0.0.1063 membrane函数对 ellipse和roundRect先看height，如果height小于阈值2，那么就绘制一条直线
+* Version 0.0.0.1064 当membrane函数的shap参数为rect时，w和h值中最小的小于2时，改用立体形状的细胞膜。
+* Version 0.0.0.1065
 
 ## More information:
 

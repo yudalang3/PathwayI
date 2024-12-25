@@ -55,32 +55,16 @@ pDescriptor <- R6Class(
       grid.newpage()
 
       if (!is.null(self$membrane)) {
-        self$draw_membrane();
+        walk(self$membrane, function(x) self$draw_membrane(x))
       }
 
       if (!is.null(self$nuclearEnvelop)) {
-        self$draw_nuclearEnvelop()
+        walk(self$nuclearEnvelop, function(x) self$draw_nuclearEnvelop(x))
       }
 
       if (!is.null(self$nuclearDNA)) {
-        nuclearDNA <- self$nuclearDNA
-        # pp$nuclearDNA = list(x = x,
-        #                      y = y ,
-        #                      dnaType = dnaType,
-        #                      numOfRepeats = numOfRepeats,
-        #                      desired_height = desired_height)
-
-        dnaHeight <- nuclearDNA$desired_height;
-        scaler <- self$scaleCoordinate
-        drawer_NDA <-
-          create_DNA_drawer(
-            dnaType = nuclearDNA$dnaType,
-            numOfRepeats = nuclearDNA$numOfRepeats,
-            desired_height = nuclearDNA$desired_height
-          )
-        drawer_NDA$draw_me(nuclearDNA$x * scaler[1], nuclearDNA$y * scaler[2] - 0.5 * dnaHeight)
+        walk(self$nuclearDNA, function(x) self$draw_nuclearDNA(x))
       }
-
 
       if (!is.null(self$nodes)) {
         self$draw_nodes();
@@ -102,7 +86,9 @@ pDescriptor <- R6Class(
     #'
     #' We separate the drawing process, this is the membrane drawing process
     #'
-    draw_membrane = function() {
+    #' @param membrane the list of the parameters
+    #'
+    draw_membrane = function(membrane) {
 
       # function(shape = c('ellipse','roundRect'),
       #          x = 0.5,
@@ -112,9 +98,6 @@ pDescriptor <- R6Class(
       #          xyLocation = NULL,
       #          phos_height = 0.15,
       #          phos_dist = 0.1) {
-
-      membrane <-  self$membrane
-
       scaler <- self$scaleCoordinate
 
 
@@ -130,7 +113,11 @@ pDescriptor <- R6Class(
         create_lipidBilayer_drawer(lipidModelIndex = 1, draw_circle_head = F)
       drawer$desired_height <- phos_height
 
-      if ("ellipse" == membrane$shape) {
+      if ('points' == membrane$shape) {
+        drawer$draw_lipid_along_curve(lineX = x ,
+                                      lineY = y,
+                                      closedPolygon = F)
+      }else if ("ellipse" == membrane$shape) {
         ## Note: the circle unit the radius is 0.5
         df_lipidsPoints <-
           produce_model_coordinate_points(
@@ -149,9 +136,21 @@ pDescriptor <- R6Class(
         shortestEdge <- min(w,h)
         # r <- 0.1 * shortestEdge
 
+        if (h < 0.2) {
+          cat("Draw the membrane with horizontal line.\n")
+          lineX <- seq.int(from = x , to = x + w, by = 0.1)
+          lineY <- rep(y, length(lineX))
+          drawer$draw_lipid_along_curve(lineX = lineX ,
+                                        lineY = lineY,
+                                        closedPolygon = F)
+          return()
+        }
+
         ## The simplest way:
         if (shortestEdge < 2) {
-          stop("Sorry, in order to get better visual effects, you need to set both the width and height greater than 2.")
+          cat("Sorry, in order to get better visual effects, you need to set both the width and height greater than 2.\n")
+          show_surface_models(painter = drawer, yHigh = y + h, yLow = y, xStart = x, xEnd = x + w)
+
         }
 
         if (w %% 0.1 > 0 || h %% 0.1 > 0) {
@@ -182,6 +181,30 @@ pDescriptor <- R6Class(
 
     },
 
+    #' @param nuclearDNA the list of input parameters
+    #'
+    #' @description
+    #' Draw the nuclear DNA of the figure
+    #'
+    #' We separate the drawing process, this is the DNA drawing process
+    #'
+    draw_nuclearDNA = function(nuclearDNA){
+      # pp$nuclearDNA = list(x = x,
+      #                      y = y ,
+      #                      dnaType = dnaType,
+      #                      numOfRepeats = numOfRepeats,
+      #                      desired_height = desired_height)
+
+      dnaHeight <- nuclearDNA$desired_height;
+      scaler <- self$scaleCoordinate
+      drawer_NDA <-
+        create_DNA_drawer(
+          dnaType = nuclearDNA$dnaType,
+          numOfRepeats = nuclearDNA$numOfRepeats,
+          desired_height = nuclearDNA$desired_height
+        )
+      drawer_NDA$draw_me(nuclearDNA$x * scaler[1], nuclearDNA$y * scaler[2] - 0.5 * dnaHeight)
+    },
 
     #' @description
     #'
@@ -289,6 +312,7 @@ pDescriptor <- R6Class(
                                  {
                                    ## TODO
                                    ## add the specfic shape of self-contained
+
                                  })
 
         bioGraphicNode$xAxis_or_radius <- x + 0.5 * width;
@@ -328,12 +352,14 @@ pDescriptor <- R6Class(
 
     },
 
-    #' Draw the nuclear envelop of the figure
+    #' @param nuclearEnvelop the list of the parameters
+    #'
     #' @description
+    #' Draw the nuclear envelop of the figure
+    #'
     #' We separate the drawing process, this is the nuclear envelop drawing process
     #'
-    draw_nuclearEnvelop = function() {
-      nuclearEnvelop <- self$nuclearEnvelop
+    draw_nuclearEnvelop = function(nuclearEnvelop) {
       scaler <- self$scaleCoordinate
       # pp$nuclearEnvelop = list(
       #   shape = shape,
@@ -429,17 +455,13 @@ pDescriptor <- R6Class(
 #'
 #' p1 + p2
 `+.pDescriptor` <- function(e1, e2) {
-  if (is.null(e2$membrane)) {
-    e2$membrane <- e1$membrane
-  }
 
-  if (is.null(e2$nuclearEnvelop)) {
-    e2$nuclearEnvelop <- e1$nuclearEnvelop
-  }
 
-  if (is.null(e2$nuclearDNA)) {
-    e2$nuclearDNA <- e1$nuclearDNA
-  }
+  e2$membrane <- list(e1$membrane, e2$membrane) |> unlist(recursive = F)
+
+  e2$nuclearEnvelop <- list(e1$nuclearEnvelop, e2$nuclearEnvelop) |> unlist(recursive = F)
+
+  e2$nuclearDNA <- list(e1$nuclearDNA, e2$nuclearDNA) |> unlist(recursive = F)
 
   if (is.null(e2$nodes)) {
     e2$nodes <- e1$nodes
@@ -461,6 +483,8 @@ pDescriptor <- R6Class(
 }
 
 
+class_name_membrane <- 'membrane'
+
 #' Prepare the membrane instance parameters
 #'
 #' @description
@@ -472,7 +496,7 @@ pDescriptor <- R6Class(
 #' Or by input the `xyLocation` of the shape, the format is same as the conventions: 2xn matrix.
 #'
 #'
-#' @param shape ellipse or round rectangle
+#' @param shape 'ellipse','roundRect', 'points' see details
 #' @param x x of the start point
 #' @param y y of the start point
 #' @param w width of the shape
@@ -481,13 +505,20 @@ pDescriptor <- R6Class(
 #' @param phos_height height of the phospholipid model, in 'inchs' not apply the `pScaleCoord`
 #' @param phos_dist the distance between two phospholipid
 #'
+#' @details
+#' In `shape` parameter, the
+#' ellipse and round rectangle are the regular shape.
+#'
+#' `points` means the users could directly import the x and y vector that contains the x/y locations.
+#' In this case the w and h parameters are ignored.
+#'
 #' @return the `pDescriptor` instance
 #' @export
 #'
 #' @examples
 #' membrane(shape = 'ellipse', x = 1, y = 0.2, w = 3, h =2)
 membrane <-
-  function(shape = c('ellipse','roundRect'),
+  function(shape = c('ellipse','roundRect', 'points'),
            x = 0.5,
            y = 0.5,
            w = 2,
@@ -497,20 +528,26 @@ membrane <-
            phos_dist = 0.1) {
     pp <- pDescriptor$new()
 
-    pp$membrane = list(
-      shape = shape,
-      x = x,
-      y = y ,
-      w = w,
-      h = h,
-      xyLocation = xyLocation,
-      phos_height = phos_height,
-      phos_dist = phos_dist
+    mm <- structure(
+      list(
+        shape = shape,
+        x = x,
+        y = y ,
+        w = w,
+        h = h,
+        xyLocation = xyLocation,
+        phos_height = phos_height,
+        phos_dist = phos_dist
+      ),
+      class = class_name_membrane
     )
+    pp$membrane = list(mm)
 
     return(pp)
   }
 
+
+class_name_nuclearEnvelop <- 'nuclearEnvelop'
 
 #'  Prepare the nuclear envelop instance parameters
 #'
@@ -541,7 +578,7 @@ nuclearEnvelop <-
     shape <- match.arg(shape)
     pp <- pDescriptor$new()
 
-    pp$nuclearEnvelop = list(
+    mm = structure(list(
       shape = shape,
       x = x,
       y = y ,
@@ -550,10 +587,14 @@ nuclearEnvelop <-
       numOfIntervals = numOfIntervals,
       percentageOfRectangle = percentageOfRectangle,
       phos_height = phos_height
-    )
+    ), class = class_name_nuclearEnvelop)
+
+    pp$nuclearEnvelop <- list(mm)
 
     return(pp)
   }
+
+class_name_nuclearDNA <- 'nuclearDNA'
 
 #' Prepare the nuclear DNA instance parameters
 #'
@@ -568,17 +609,30 @@ nuclearEnvelop <-
 #'
 #' @examples
 #' nuclearDNA(x = 3.5, y = 0.7)
-nuclearDNA <- function(x, y, dnaType = 2,numOfRepeats = 3,desired_height = 0.35) {
-  pp <- pDescriptor$new()
+nuclearDNA <-
+  function(x,
+           y,
+           dnaType = 2,
+           numOfRepeats = 3,
+           desired_height = 0.35) {
+    pp <- pDescriptor$new()
 
-  pp$nuclearDNA = list(x = x,
-                           y = y ,
-                           dnaType = dnaType,
-                           numOfRepeats = numOfRepeats,
-                           desired_height = desired_height)
+    mm <- structure(
+      list(
+        x = x,
+        y = y ,
+        dnaType = dnaType,
+        numOfRepeats = numOfRepeats,
+        desired_height = desired_height
+      ),
+      class = class_name_nuclearDNA
+    )
 
-  return(pp)
-}
+
+    pp$nuclearDNA = list(mm)
+
+    return(pp)
+  }
 
 #' The main pathway component expressed in here.
 #'
@@ -721,4 +775,11 @@ pScaleCoord <- function(oriWidth = 1, oriHeight = 1, destWidth = 1, destHeight =
   pp$scaleCoordinate <- c(destWidth / oriWidth, destHeight/oriHeight);
 
   return(pp)
+}
+
+
+pTheme <- function(name = 'raw') {
+  if (condition) {
+
+  }
 }

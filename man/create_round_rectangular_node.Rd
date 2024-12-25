@@ -26,6 +26,10 @@ the instance
 \description{
 Create the round rectangular bio graphics node drawer.
 }
+\details{
+Why the parameter does not have the scale*prefix ? Because it is produced not through
+a template.
+}
 \examples{
 create_round_rectangular_node()
 }

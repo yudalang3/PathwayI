@@ -110,6 +110,11 @@ global_bioGraphics_nodes <- new.env()
 #' @return a list of the needed information
 #' @export
 #'
+#' @details
+#' The returned list is consists of the elements, which has the property of `width` and `height`, as well as a `grob`.
+#' The `width` and `height` are the center of the `grob`.
+#'
+#'
 #' @examples
 #' get_global_bioGraphics_nodes_list() |> names()
 get_global_bioGraphics_nodes_list <- function() {

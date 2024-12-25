@@ -5,16 +5,29 @@
 \title{Create the object with the self contained simple bio graphics node.
 This node is only has one shape x y coordinates.}
 \usage{
-create_selfContained_simple_bioGraphicsNode(name)
+create_selfContained_simple_bioGraphicsNode(
+  name,
+  expectWidth = 1,
+  expectHeight = NA_real_
+)
 }
 \arguments{
 \item{name}{the name of the supported free shape.}
+
+\item{expectWidth}{the user expected width, recommendation is in 'inch', default 1}
+
+\item{expectHeight}{the user expected height recommendation is in 'inch'. set it as \code{NA} for scaling by one para. default is NA.}
 }
 \value{
 A BioGraphicNode instance.
 }
 \description{
 use \code{basic_bioGraphics_templates |> names()} to see the supported name.
+}
+\details{
+Note: this is NOT the scaler of width height, it is the final obtained height and width
+
+If you want to scale according to one length, set the \code{expectHeight} as NA, default is NA.
 }
 \examples{
 create_selfContained_simple_bioGraphicsNode('LRP_1')

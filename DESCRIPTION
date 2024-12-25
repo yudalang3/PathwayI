@@ -19,7 +19,8 @@ Imports:
     purrr,
     R6,
     gridGeometry,
-    dplyr
+    dplyr,
+    rlang
 Depends: 
     R (>= 2.10)
 LazyData: true

@@ -4,18 +4,30 @@
 \alias{create_freeShape_node}
 \title{Create the free shape bio graphics node drawer.}
 \usage{
-create_freeShape_node(inner_extension_ratio = 0, xyPoints_shape)
+create_freeShape_node(
+  inner_extension_ratio = 0,
+  xyPoints_shape,
+  scaleWidth = 1,
+  scaleHeight = 1
+)
 }
 \arguments{
 \item{inner_extension_ratio}{try this argument yourself}
 
 \item{xyPoints_shape}{the 2xn matrix, where first line is x, next line is y}
+
+\item{scaleWidth}{the scaler of the width}
+
+\item{scaleHeight}{the scaler of the height}
 }
 \value{
 the instance
 }
 \description{
 Create the free shape bio graphics node drawer.
+}
+\details{
+Note: this is the scaler of width and height, not the final obtained height and width
 }
 \examples{
 create_freeShape_node(xyPoints_shape = rbind(c(1,2,3), c(2,3,4)))

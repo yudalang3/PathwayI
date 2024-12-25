@@ -1,3 +1,6 @@
+##### 重要通知，这个类已经被废弃，使用 tryR这个包里面的功能
+#####
+
 
 #' Generate continuous value to color mapper
 #'
@@ -58,7 +61,7 @@ discreteMapper <- function(colors = NA,
   return(dMapper)
 }
 
-#' Generate color for the input x
+#' Generate colors for the input x
 #'
 #' @param x matrix or numeric vector
 #' @param values2colorMapper
@@ -98,7 +101,7 @@ generate_colors <- function(x, values2colorMapper) {
 
 
 
-#' Generate equal spersed intervals from x numeric values according to the number of intervals and center parameter.
+#' Generate equal dispersed intervals from x numeric values according to the number of intervals and center parameter.
 #'
 #' @param x : numeric values, e.g. (1,1.2,3,0.5)
 #' @param numOfBreakPoints : number of intervals (number of break points - 1)
@@ -148,7 +151,7 @@ init_discrete_mapper <- function(.Object,
                                  colo_of_NA = 'grey',
                                  colors = NULL,
                                  break_points = NULL) {
-  if (is.null(colors) || is.null(range)) {
+  if (is.null(colors) || is.null(break_points)) {
     stop('You need to input both ranger and colors')
   }
 
